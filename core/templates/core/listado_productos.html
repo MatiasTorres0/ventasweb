@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+<h2>Productos</h2>
+<table>
+    <tr>
+        <th>Nombre Producto</th>
+        <br><th>Precio</th>
+        <th>Foto</th>
+    </tr>
+    {% for p in productos %}
+    <tr>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.precio }}</td>
+        <td>{{ p.imagen }}</td>
+
+        <td>
+            <a href="{% url 'modificar_producto' p.id %}">Modificar</a>
+            <a href="% url 'eliminar_producto' p.id %">Eliminar</a>
+
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
