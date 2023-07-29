@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ventas con Búsqueda de Productos</title>
+</head>
+<body>
+  <h1>Ventas con Búsqueda de Productos</h1>
+  <div>
+    <label for="productSearch">Buscar Producto por Nombre:</label>
+    <input type="text" id="productSearch" oninput="buscarProductos()">
+  </div>
+
+  <h2>Resultados de la Búsqueda</h2>
+  <ul id="productList"></ul>
+
+  <div>
+    <label for="manualProductBarcode">Código de Barras:</label>
+    <input type="text" id="manualProductBarcode">
+    <button type="button" onclick="agregarProductoPorCodigoBarras()">Agregar Producto</button>
+  </div>
+
+  <h2>Lista de Compra</h2>
+  <ul id="shoppingList"></ul>
+
+  <div>
+    <p>Total a Pagar: $<span id="totalAmount">0.00</span></p>
+    <button type="button" onclick="pagar()">Pagar</button>
+  </div>
+
+  <script>
+    // Simulamos una base de datos de productos con algunos datos de ejemplo.
+    const products = [
+      { id: "123456789", name: "Producto Ejemplo 1", price: 100.00, discount: 10 },
+      { id: "987654321", name: "Producto Ejemplo 2", price: 50.00, discount: 5 },
+      { id: "135792468", name: "Otro Producto 1", price: 75.00, discount: 0 },
+      { id: "246813579", name: "Otro Producto 2", price: 120.00, discount: 15 }
+    ];
+
+    let shoppingCart = [];
+    let totalAmount = 0.00;
+
+    function buscarProductos() {
+      const searchTerm = document.getElementById("productSearch").value.toLowerCase();
+      const productList = document.getElementById("productList");
+      productList.innerHTML = ""; // Limpiamos la lista antes de mostrar los resultados.
+
+      products.forEach(product => {
+        if (product.name.toLowerCase().includes(searchTerm)) {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${product.name} - Precio: $${product.price.toFixed(2)} - Descuento: ${product.discount}%`;
+          listItem.setAttribute("data-product-id", product.id);
+          listItem.addEventListener("click", agregarProductoPorNombre);
+          productList.appendChild(listItem);
+        }
+      });
+    }
+
+    function agregarProductoPorNombre(event) {
+      const productId = event.target.getAttribute("data-product-id");
+      const selectedProduct = products.find(product => product.id === productId);
+      agregarProducto(selectedProduct);
+    }
+
+    function agregarProductoPorCodigoBarras() {
+      const manualProductBarcode = document.getElementById("manualProductBarcode").value;
+      const selectedProduct = products.find(product => product.id === manualProductBarcode);
+      if (selectedProduct) {
+        agregarProducto(selectedProduct);
+      } else {
+        alert("Producto no encontrado en la base de datos.");
+      }
+    }
+
+    function agregarProducto(product) {
+      shoppingCart.push(product);
+      actualizarListaCompra();
+    }
+
+    function eliminarProducto(index) {
+      shoppingCart.splice(index, 1);
+      actualizarListaCompra();
+    }
+
+    function actualizarListaCompra() {
+      const shoppingList = document.getElementById("shoppingList");
+      shoppingList.innerHTML = "";
+
+      totalAmount = 0.00;
+      shoppingCart.forEach((product, index) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${product.name} - Precio: $${product.price.toFixed(2)} - Descuento: ${product.discount}%`;
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Eliminar";
+        deleteButton.addEventListener("click", () => eliminarProducto(index));
+        listItem.appendChild(deleteButton);
+        shoppingList.appendChild(listItem);
+
+        totalAmount += product.price * (1 - product.discount / 100);
+      });
+
+      document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
+    }
+
+    function pagar() {
+      // Aquí podrías implementar la lógica para procesar el pago y guardar la venta en la base de datos.
+      alert(`Total a Pagar: $${totalAmount.toFixed(2)}. ¡Gracias por su compra!`);
+      shoppingCart = [];
+      actualizarListaCompra();
+    }
+  </script>
+</body>
+</html>

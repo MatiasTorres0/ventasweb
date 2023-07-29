@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Consultar Precio</title>
+</head>
+<body>
+  <h1>Consultar Precio</h1>
+  <label for="productBarcode">Ingrese el Código de Barras:</label>
+  <input type="text" id="productBarcode" required>
+  <button type="button" onclick="consultarPrecio()">Consultar</button>
+
+  <div id="productInfo" style="display: none;">
+    <h2>Información del Producto</h2>
+    <p><strong>Nombre:</strong> <span id="productName"></span></p>
+    <p><strong>Precio:</strong> $<span id="productPrice"></span></p>
+    <p><strong>Descuento:</strong> <span id="productDiscount"></span>%</p>
+  </div>
+
+  <script>
+    function consultarPrecio() {
+      const productBarcode = document.getElementById("productBarcode").value;
+
+      // Aquí, puedes realizar una solicitud AJAX para consultar el precio del producto en el servidor o utilizar una base de datos local.
+      // Por simplicidad, aquí definimos algunos datos de ejemplo para demostrar el funcionamiento.
+
+      const products = {
+        "123456789": {
+          name: "Producto Ejemplo",
+          price: 100.00,
+          discount: 10
+        },
+        "987654321": {
+          name: "Otro Producto",
+          price: 50.00,
+          discount: 5
+        }
+      };
+
+      const productInfo = products[productBarcode];
+
+      if (productInfo) {
+        // Si el producto se encuentra en la base de datos, mostramos la información del producto en la página.
+        document.getElementById("productName").textContent = productInfo.name;
+        document.getElementById("productPrice").textContent = productInfo.price.toFixed(2);
+        document.getElementById("productDiscount").textContent = productInfo.discount;
+        document.getElementById("productInfo").style.display = "block";
+      } else {
+        // Si el producto no se encuentra en la base de datos, mostramos un mensaje de error.
+        alert("Producto no encontrado. Verifique el código de barras ingresado.");
+        document.getElementById("productInfo").style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>

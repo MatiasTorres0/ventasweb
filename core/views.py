@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 from .forms import LoginForm, ProductoForm
 from .models import Producto
 from django.contrib import messages
@@ -75,6 +77,21 @@ def modificar_producto(request, id):
 def eliminar_producto(request, id):
     producto = Producto.objects.get(id=id)
     producto.delete()
+
+def agregar(request):
+    return render(request, 'core/agregar.html')
+
+
+def buscar_producto(request):
+    search_input = request.GET.get('search_input', '').lower()
+    # Filtrar los productos que coincidan con el criterio de búsqueda
+    filtered_products = Producto.objects.filter(nombre__icontains=search_input)
+
+    context = {
+        'products': filtered_products,
+        'search_input': search_input,
+    }
+    return render(request, 'core/buscar_producto.html', context)
 
 # firebase login
 # firebase init

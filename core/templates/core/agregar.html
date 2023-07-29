@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Agregar Producto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Agregar Producto</h1>
+  <form id="productForm">
+    <label for="productName">Nombre del Producto:</label>
+    <input type="text" id="productName" required><br>
+
+    <label for="productBarcode">Código de Barras:</label>
+    <input type="text" id="productBarcode" required><br>
+
+    <label for="productPrice">Precio:</label>
+    <input type="number" id="productPrice" step="0.01" required><br>
+
+    <label for="productQuantity">Cantidad en Inventario:</label>
+    <input type="number" id="productQuantity" required><br>
+
+    <label for="productDiscount">Descuento (%):</label>
+    <input type="number" id="productDiscount"><br>
+
+    <button type="button" onclick="addProduct()">Agregar Producto</button>
+  </form>
+
+  <script>
+    function addProduct() {
+      const productName = document.getElementById("productName").value;
+      const productBarcode = document.getElementById("productBarcode").value;
+      const productPrice = parseFloat(document.getElementById("productPrice").value);
+      const productQuantity = parseInt(document.getElementById("productQuantity").value);
+      const productDiscount = parseFloat(document.getElementById("productDiscount").value) || 0;
+
+      // Aquí puedes hacer lo que necesites con los datos ingresados,
+      // como enviarlos a un servidor mediante una solicitud AJAX o guardarlos en una base de datos.
+      // Por simplicidad, aquí solo mostramos los datos en la consola.
+      console.log("Producto Agregado:");
+      console.log("Nombre:", productName);
+      console.log("Código de Barras:", productBarcode);
+      console.log("Precio:", productPrice);
+      console.log("Cantidad en Inventario:", productQuantity);
+      console.log("Descuento (%):", productDiscount);
+    }
+  </script>
+</body>
+</html>
