@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+<body>
+
+    <h2>Autentificación</h2>
+    <form action="" method="POST">
+            {% csrf_token %}
+            <table>
+                {{ form.as_table }}
+
+            </table>
+            <input type="submit" value="Login">
+    </form>
+
+    <style>
+        /* Estilos para el formulario */
+        form {
+            max-width: 400px;
+            margin: 0 auto; /* Centrar horizontalmente */
+            padding: 20px;
+            border: 1px solid #ccc; /* Borde que identifica el inicio y fin del formulario */
+            border-radius: 10px; /* Bordes redondeados */
+        }
+    
+        /* Estilos para cada campo del formulario */
+        form table tr td {
+            padding: 5px;
+            border-radius: 10px; /* Bordes redondeados */
+        }
+    
+        /* Estilos para los botones */
+        input[type="reset"],
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px; /* Bordes redondeados */
+            background-color: #007bff; /* Color de fondo para los botones */
+            color: #fff; /* Color del texto de los botones */
+            cursor: pointer;
+        }
+    
+        input[type="reset"] {
+            background-color: #ccc; /* Cambia el color de fondo para el botón "Limpiar" */
+        }
+    
+        /* Estilos para la barra de navegación en pantallas pequeñas */
+        .navbar-toggle {
+            display: none;
+        }
+      
+        @media (max-width: 768px) {
+            .navbar-toggle {
+                display: block;
+            }
+        }
+    </style>
+    <style>
+    /* Estilos para el formulario */
+    form {
+        max-width: 400px;
+        margin: 0 auto; /* Centrar horizontalmente */
+        padding: 20px;
+        border: 1px solid #ccc; /* Borde que identifica el inicio y fin del formulario */
+        border-radius: 10px; /* Bordes redondeados */
+    }
+
+    /* Estilos para cada campo del formulario */
+    form table tr td {
+        padding: 5px;
+        border-radius: 10px; /* Bordes redondeados */
+    }
+
+    /* Estilos para los botones */
+    input[type="reset"],
+    input[type="submit"] {
+        margin-top: 10px;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px; /* Bordes redondeados */
+        background-color: #007bff; /* Color de fondo para los botones */
+        color: #fff; /* Color del texto de los botones */
+        cursor: pointer;
+    }
+
+    input[type="reset"] {
+        background-color: #ccc; /* Cambia el color de fondo para el botón "Limpiar" */
+    }
+
+    /* Estilos para la barra de navegación en pantallas pequeñas */
+    .navbar-toggle {
+        display: none;
+    }
+  
+    @media (max-width: 768px) {
+        .navbar-toggle {
+            display: block;
+        }
+    }
+</style>
+
+
+    {% endblock %}

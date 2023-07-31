@@ -59,11 +59,26 @@
                                     <nav class="main-menu">
                                         <ul class="menu-area-main">
                                             <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                                            {% if user.is_authenticated %}
                                             <li><a href="{% url 'listado_productos' %}">Productos</a></li>
+
                                             <li><a href="{% url 'nuevo_producto' %}">Nuevo Producto</a></li>
                                             <li><a href="{% url 'index' %}">Contact Us</a></li>
+                                            {% endif %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
+                                            {% if user.is_authenticated %}
                                             <li><a href="{% url 'buscar_producto' %}">Buscar</a></li>
+                                            <li><a href="{% url 'ventas' %}">Ventas</a></li>
+                                            <li><a href="{% url 'buscar_producto' %}">Consultar</a></li>
+                                            <li><a href="{% url 'modificar' %}">Modificar</a></li>
+                                            {% endif %}
+                                            {% if user.is_authenticated %}
+                                            <li>
+                                            <a href="#">{{ user.username}}</a>
+                                            </li>
+                                            <li><a href="{% url 'logout' %}">Cerrar sesion</a></li>
+                                           {% endif %}
+                                           
                                         </ul>
                                     </nav>
                                 </div>
@@ -72,6 +87,7 @@
                     </div>
                 </div>
             </div>
+            
             <div id="principal">
                 <br>
                 {% block contenido %}

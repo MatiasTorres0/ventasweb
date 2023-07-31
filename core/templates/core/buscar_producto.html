@@ -1,47 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Búsqueda de Producto por Nombre</title>
-</head>
-<body>
-  <h1>Búsqueda de Producto por Nombre</h1>
-  <label for="productName">Ingrese el Nombre del Producto:</label>
-  <input type="text" id="productName" required>
-  <button type="button" onclick="buscarProducto()">Buscar</button>
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+    <title>Búsqueda de Producto por Nombre</title>
 
-  <div id="searchResults">
-    <h2>Resultados de la Búsqueda</h2>
-    <ul id="productList"></ul>
-  </div>
+    <h1>Búsqueda de Producto por Nombre</h1>
+    <label for="productName">Ingrese el Nombre del Producto:</label>
+    <input type="text" id="productName" required>
+    <button type="button" onclick="buscarProducto()">Buscar</button>
 
-  <script>
-    function buscarProducto() {
-      const searchInput = document.getElementById("productName").value.toLowerCase();
+    <div id="searchResults">
+        <h2>Resultados de la Búsqueda</h2>
+        <ul id="productList"></ul>
+    </div>
 
-      // Realizar la solicitud AJAX a la URL de Django
-      fetch(`/buscar-producto/?search_input=${searchInput}`)
-        .then(response => response.json())
-        .then(data => mostrarResultados(data))
-        .catch(error => console.error("Error en la solicitud AJAX:", error));
-    }
+    <script>
+        function buscarProducto() {
+            const searchInput = document.getElementById("productName").value.toLowerCase();
 
-    function mostrarResultados(products) {
-      const productListElement = document.getElementById("productList");
-      productListElement.innerHTML = ""; // Limpiamos la lista antes de mostrar los resultados.
+            // Realizar la solicitud AJAX a la URL de Django
+            fetch(`/buscar-producto/?search_input=${searchInput}`)
+                .then(response => response.json())
+                .then(data => mostrarResultados(data))
+                .catch(error => console.error("Error en la solicitud AJAX:", error));
+        }
 
-      if (products.length > 0) {
-        products.forEach(product => {
-          const listItem = document.createElement("li");
-          listItem.textContent = `${product.nombre} - Precio: $${product.precio} - Descripcion: ${product.descripcion}`;
-          productListElement.appendChild(listItem);
-        });
-      } else {
-        const noResultsItem = document.createElement("li");
-        noResultsItem.textContent = "No se encontraron productos que coincidan con la búsqueda.";
-        productListElement.appendChild(noResultsItem);
-      }
-    }
-  </script>
-</body>
-</html>
+        function mostrarResultados(products) {
+            const productListElement = document.getElementById("productList");
+            productListElement.innerHTML = ""; // Limpiamos la lista antes de mostrar los resultados.
 
+            if (products.length > 0) {
+                products.forEach(product => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${product.nombre} - Precio: $${product.precio} - Descripcion: ${product.descripcion}`;
+                    productListElement.appendChild(listItem);
+                });
+            } else {
+                const noResultsItem = document.createElement("li");
+                noResultsItem.textContent = "No se encontraron productos que coincidan con la búsqueda.";
+                productListElement.appendChild(noResultsItem);
+            }
+        }
+    </script>
+    
+{% endblock %}

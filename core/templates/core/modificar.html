@@ -66,14 +66,9 @@
         <div class="producto">
             <img src="{{ p.imagen }}" alt="{{ p.nombre }}">
             <h3>{{ p.nombre }}</h3>
-            <p><strong>{{ p.precio }}</strong></p>
-
-    <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
-        {% csrf_token %}
-        <button type="submit">Agregar al carrito</button>
-    </form>
-            <!---<a href="{% url 'modificar_producto' p.id %}">Modificar</a>
-            <a href="% url 'eliminar_producto' p.id %">Eliminar</a>-->
+            <p><strong>${{ p.precio }}</strong></p>
+            <a href="{% url 'modificar_producto' p.id %}">Modificar</a>
+            <a href="% url 'eliminar_producto' p.id %">Eliminar</a>
         </div>
         {% endfor %}
     </div>
