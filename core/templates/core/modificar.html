@@ -5,14 +5,18 @@
     /* Estilos para el contenedor de los productos */
     .productos {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Cuadrícula flexible */
-        grid-gap: 20px; /* Espacio entre productos */
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        /* Cuadrícula flexible */
+        grid-gap: 20px;
+        /* Espacio entre productos */
     }
 
     /* Estilos para cada producto */
     .producto {
-        border: 1px solid #ccc; /* Borde para cada producto */
-        border-radius: 10px; /* Bordes redondeados */
+        border: 1px solid #ccc;
+        /* Borde para cada producto */
+        border-radius: 10px;
+        /* Bordes redondeados */
         padding: 20px;
         text-align: center;
     }
@@ -21,7 +25,8 @@
     .producto img {
         max-width: 100%;
         height: auto;
-        border-radius: 10px; /* Bordes redondeados para la imagen */
+        border-radius: 10px;
+        /* Bordes redondeados para la imagen */
     }
 
     /* Estilos para los botones de modificar y eliminar */
@@ -30,19 +35,24 @@
         margin-top: 10px;
         padding: 8px 15px;
         border: none;
-        border-radius: 5px; /* Bordes redondeados */
-        color: #fff; /* Color del texto de los botones */
+        border-radius: 5px;
+        /* Bordes redondeados */
+        color: #fff;
+        /* Color del texto de los botones */
         cursor: pointer;
         text-decoration: none;
-        width: 100%; /* Ocupar todo el ancho del contenedor */
+        width: 100%;
+        /* Ocupar todo el ancho del contenedor */
     }
 
     .producto a:nth-child(1) {
-        background-color: #007bff; /* Color de fondo para el botón "Modificar" */
+        background-color: #007bff;
+        /* Color de fondo para el botón "Modificar" */
     }
 
     .producto a:nth-child(2) {
-        background-color: #dc3545; /* Color de fondo para el botón "Eliminar" */
+        background-color: #dc3545;
+        /* Color de fondo para el botón "Eliminar" */
     }
 </style>
 <h2>Productos</h2>
@@ -67,8 +77,10 @@
             <img src="{{ p.imagen }}" alt="{{ p.nombre }}">
             <h3>{{ p.nombre }}</h3>
             <p><strong>${{ p.precio }}</strong></p>
-            <a href="{% url 'modificar_producto' p.id %}">Modificar</a>
-            <a href="% url 'eliminar_producto' p.id %">Eliminar</a>
+            <a href="{% url 'modificar_producto' p.id %}" class="enlace">Modificar</a>
+            {% if p.id %}
+            <a href="{% url 'eliminar_producto' p.id %}" class="enlace">Eliminar</a>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -76,6 +88,28 @@
 </div>
 
 
+<script>
+    // Función para redireccionar a la página de modificación del producto con el ID correspondiente
+    function redirectToModificar(id) {
+        window.location.href = `/ruta/modificar/${id}/`;  // Reemplaza '/ruta/modificar/' con la URL adecuada de tu proyecto Django
+    }
+
+    // Función para redireccionar a la página de eliminación del producto con el ID correspondiente
+    function redirectToEliminar(id) {
+        window.location.href = `/ruta/eliminar/${id}/`;  // Reemplaza '/ruta/eliminar/' con la URL adecuada de tu proyecto Django
+    }
+</script>
+<style>
+    /* Estilo para los enlaces con la clase "enlace" */
+    a.enlace {
+        color: blue; /* Cambia "blue" por el color que desees */
+        text-decoration: none; /* Opcionalmente, puedes eliminar la subrayado de los enlaces */
+    }
+
+    /* Estilo para los enlaces cuando están en estado de "hover" (cuando el mouse está encima) */
+    a.enlace:hover {
+        color: red; /* Cambia "red" por el color que desees para cuando el mouse esté encima del enlace */
+    }
+</style>
 
 {% endblock %}
-

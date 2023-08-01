@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
@@ -56,6 +56,7 @@ def listado_productos(request):
     precio_min = request.GET.get('precio_min')
     precio_max = request.GET.get('precio_max')
     categorias_seleccionadas = request.GET.getlist('categoria')
+    imagen_predeterminada_url = '/media/productos/default.jpg'
 
     # Filtrar por precio mínimo y máximo
     if precio_min:
@@ -67,6 +68,13 @@ def listado_productos(request):
     if categorias_seleccionadas:
         productos = productos.filter(categoria__in=categorias_seleccionadas)
 
+    for producto in productos:
+        if not producto.imagen:
+            producto.imagen = imagen_predeterminada_url
+
+    context = {
+        'productos': productos
+    }
     return render(request, 'core/listado_productos.html', {'productos': productos, 'categorias': categorias})
 
 @login_required
@@ -96,8 +104,15 @@ def modificar_producto(request, id):
     return render(request, 'core/modificar_producto.html', data)
 @login_required
 def eliminar_producto(request, id):
-    producto = Producto.objects.get(id=id)
-    producto.delete()
+    try:
+        producto = Producto.objects.get(id=id)
+        producto.delete()
+        messages.success(request, "El producto fue eliminado Correctamente")
+        return redirect("modificar")
+    except Producto.DoesNotExist:
+        messages.error(request, "El producto no existe")
+        return redirect("modificar")
+
 @login_required
 def agregar(request):
     return render(request, 'core/agregar.html')
@@ -159,7 +174,7 @@ def generar_boleta(request):
 
     p.save()
     return response
-@login_required
+
 def agregar_al_carrito(request, producto_id):
     producto = Producto.objects.get(pk=producto_id)
 
@@ -169,7 +184,10 @@ def agregar_al_carrito(request, producto_id):
     request.session['carrito'].append(producto_id)
     request.session.modified = True
 
-    return redirect('listado_productos')
+    return redirect('carrito_ventas') 
+
+
+@login_required
 def modificar(request):
     productos = Producto.objects.all()
     categorias = Categoria.objects.all()
@@ -189,7 +207,28 @@ def modificar(request):
     if categorias_seleccionadas:
         productos = productos.filter(categoria__in=categorias_seleccionadas)
 
-    return render(request, 'core/listado_productos.html', {'productos': productos, 'categorias': categorias})
+    return render(request, 'core/modificar.html', {'productos': productos, 'categorias': categorias})
 # firebase login
 # firebase init
 # firebase deploy
+@login_required
+def carrito_ventas(request):
+    carrito_productos = []
+    carrito_ids = request.session.get('carrito', [])
+
+    for producto_id in carrito_ids:
+        producto = Producto.objects.get(pk=producto_id)
+        carrito_productos.append(producto)
+
+    return render(request, 'core/carrito_ventas.html', {'carrito_productos': carrito_productos})
+
+
+def realizar_pago(request):
+    # Aquí iría la lógica para procesar el pago, por ejemplo, interactuar con una pasarela de pago.
+    # Dependiendo de tu implementación, puede ser necesario usar formularios, recibir datos de la solicitud,
+    # procesar la información del carrito de compras, calcular el total, etc.
+
+    # Ejemplo básico: supongamos que el pago es exitoso y queremos mostrar un mensaje de éxito.
+    mensaje = "¡Pago realizado con éxito! Gracias por tu compra."
+
+    return render(request, 'core/pago_exitoso.html', {'mensaje': mensaje})

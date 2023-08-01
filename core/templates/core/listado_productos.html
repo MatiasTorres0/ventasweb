@@ -64,16 +64,13 @@
     <div class="productos">
         {% for p in productos %}
         <div class="producto">
-            <img src="{{ p.imagen }}" alt="{{ p.nombre }}">
+            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
             <h3>{{ p.nombre }}</h3>
             <p><strong>{{ p.precio }}</strong></p>
-
-    <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
-        {% csrf_token %}
-        <button type="submit">Agregar al carrito</button>
-    </form>
-            <!---<a href="{% url 'modificar_producto' p.id %}">Modificar</a>
-            <a href="% url 'eliminar_producto' p.id %">Eliminar</a>-->
+            <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
+                {% csrf_token %}
+                <button type="submit">Agregar al carrito</button>
+            </form>
         </div>
         {% endfor %}
     </div>
