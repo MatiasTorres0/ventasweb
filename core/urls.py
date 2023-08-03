@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth.views import LoginView
 from .views import home, login, index, listado_productos, nuevo_producto, modificar_producto, eliminar_producto, agregar
 from . import views
 urlpatterns = [
@@ -19,4 +20,10 @@ urlpatterns = [
     path('eliminar_producto/<int:id>/', views.eliminar_producto, name="eliminar_producto"),
     path('carrito/', views.carrito_ventas, name="carrito_ventas"),
     path('realizar_pago/', views.realizar_pago, name='realizar_pago'),
+    path('chat/', views.chat_room, name='chat-room'),
+    path('send_message/', views.send_message, name='send-message'),
+    path('get_messages/', views.get_messages, name='get-messages'),
+    path('nueva-conversacion/', views.nueva_conversacion, name='nueva_conversacion'),
+    path('evaluation/', views.evaluation, name='evaluation'),
+    path('worker_chat/', LoginView.as_view(template_name='worker_chat.html'), name='worker-chat'),
 ]

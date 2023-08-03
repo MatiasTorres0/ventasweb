@@ -2,36 +2,208 @@
 {% load static %}
 
 {% block contenido %}
-  <h2>Carrito de Ventas</h2>
-  <ul>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 20px;
+  }
+
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+
+  .carrito-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .carrito-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  .producto-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .producto-item {
+    padding: 8px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .producto-nombre {
+    font-size: 18px;
+  }
+
+  .producto-precio {
+    font-size: 16px;
+    color: #007bff;
+  }
+
+  .total-amount {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 16px;
+  }
+
+  .metodo-pago-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .metodo-pago-label {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .metodo-pago-select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .monto-pagado-label {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .monto-pagado-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .vuelto-label,
+  .iva-pagado-label {
+    font-size: 18px;
+  }
+
+  .vuelto-input,
+  .iva-pagado-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .pago-button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 16px;
+  }
+
+  .pago-button:hover {
+    background-color: #0056b3;
+  }
+</style>
+<style>
+  /* Estilos anteriores... */
+
+  /* Nuevo estilo para el botón de eliminar */
+  .eliminar-button {
+    padding: 4px 8px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+
+  .eliminar-button:hover {
+    background-color: #c82333;
+  }
+</style>
+
+<div class="carrito-container">
+  <h2 class="carrito-title">Carrito de Ventas</h2>
+  <ul class="producto-list">
     {% for producto in carrito_productos %}
-      <li>{{ producto.nombre }} - Precio: {{ producto.precio }}</li>
+      <li class="producto-item">
+        <span class="producto-nombre">{{ producto.nombre }}</span>
+        <span class="producto-precio">$ {{ producto.precio }}</span>
+        <button class="eliminar-button" onclick="eliminarProducto('{{ producto.id }}')">Eliminar</button>
+      </li>
+      
     {% endfor %}
   </ul>
-  <p>Total a Pagar: $<span id="totalAmount">{{ totalAmount }}</span></p>
+  <p>Total a Pagar: $<span id="totalAmount">0</span></p>
 
-  <form method="post" action="{% url 'realizar_pago' %}">
+  <form class="metodo-pago-container" method="post" action="{% url 'realizar_pago' %}">
     {% csrf_token %}
     
-    <label for="metodoPago">Método de Pago:</label>
-    <select id="metodoPago" name="metodoPago">
+    <label class="metodo-pago-label" for="metodoPago">Método de Pago:</label>
+    <select class="metodo-pago-select" id="metodoPago" name="metodoPago">
       <option value="efectivo">Efectivo</option>
       <option value="tarjeta_credito">Tarjeta de Crédito</option>
       <option value="tarjeta_debito">Tarjeta de Débito</option>
       <option value="prepago">Prepago</option>
     </select>
-    <br>
-    <label for="montoPagado">Monto Pagado:</label>
-    <input type="number" id="montoPagado" name="montoPagado" min="0" step="0.01">
-    <br>
-    <label for="vuelto">Vuelto:</label>
-    <input type="number" id="vuelto" name="vuelto" disabled>
-    <br>
-    <label for="ivaPagado">IVA Pagado:</label>
-    <input type="number" id="ivaPagado" name="ivaPagado" disabled>
-    <br>
-    <button type="submit">Realizar Pago</button>
+    
+    <label class="monto-pagado-label" for="montoPagado">Monto Pagado:</label>
+    <input class="monto-pagado-input" type="number" id="montoPagado" name="montoPagado" min="0" step="0.01">
+    
+    <label class="vuelto-label" for="vuelto">Vuelto:</label>
+    <input class="vuelto-input" type="number" id="vuelto" name="vuelto" disabled>
+    
+    <label class="iva-pagado-label" for="ivaPagado">IVA Pagado:</label>
+    <input class="iva-pagado-input" type="number" id="ivaPagado" name="ivaPagado" disabled>
+    
+    <button class="pago-button" type="submit">Realizar Pago</button>
   </form>
+</div>
+<script>
+  // Resto del código JavaScript (sin cambios)...
+  // ...
+
+  function eliminarProducto(productoId) {
+    // Realizar una solicitud AJAX al servidor para eliminar el producto del carrito
+    fetch(`/eliminar-producto/${productoId}/`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        // Si la eliminación fue exitosa, recargar la página para actualizar el carrito
+        location.reload();
+      } else {
+        // Mostrar un mensaje de error si no se pudo eliminar el producto
+        alert('Error al eliminar el producto del carrito.');
+      }
+    }).catch(error => {
+      console.error('Error en la solicitud AJAX:', error);
+    });
+  }
+</script>
   <script>
     // Resto del código JavaScript (sin cambios)...
     // ...
@@ -125,33 +297,33 @@
 
 
     function actualizarListaCompra() {
-  const shoppingList = document.getElementById("shoppingList");
-  shoppingList.innerHTML = "";
+      const shoppingList = document.getElementById("shoppingList");
+      shoppingList.innerHTML = "";
 
-  totalAmount = 0.00;
-  shoppingCart.forEach((product, index) => {
-    const listItem = document.createElement("li");
-    const productPrice = parseFloat(product.precio); // Convert to a number
-    if (!isNaN(productPrice)) { // Check if the conversion was successful
-      console.log(`Product Price for ${product.nombre}: ${productPrice}`);
-      const discount = product.descuento || 0; // Use 0 as the default discount if it's not provided
-      listItem.textContent = `${product.nombre} - Precio: $${productPrice.toFixed(2)}`;
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Eliminar";
-      deleteButton.addEventListener("click", () => eliminarProducto(index));
-      listItem.appendChild(deleteButton);
-      shoppingList.appendChild(listItem);
+      totalAmount = 0;
+      shoppingCart.forEach((product, index) => {
+        const listItem = document.createElement("li");
+        const productPrice = parseFloat(product.precio); // Convert to a number
+        if (!isNaN(productPrice)) { // Check if the conversion was successful
+          console.log(`Product Price for ${product.nombre}: ${productPrice}`);
+          const discount = product.descuento || 0; // Use 0 as the default discount if it's not provided
+          listItem.textContent = `${product.nombre} - Precio: $${Math.trunc(productPrice)}`;
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Eliminar";
+          deleteButton.addEventListener("click", () => eliminarProducto(index));
+          listItem.appendChild(deleteButton);
+          shoppingList.appendChild(listItem);
 
-      totalAmount += productPrice * (1 - discount / 100);
-    } else {
-      console.error(`Invalid price for product '${product.nombre}'`);
+          totalAmount += productPrice * (1 - discount / 100);
+        } else {
+          console.error(`Invalid price for product '${product.nombre}'`);
+        }
+      });
+
+      console.log(`Total Amount: ${totalAmount}`);
+
+      document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
     }
-  });
-
-  console.log(`Total Amount: ${totalAmount}`);
-
-  document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
-}
 
 function pagar() {
 // Mostrar el formulario de método de pago
@@ -211,9 +383,9 @@ function actualizarListaCompra() {
 }
 
 function eliminarProducto(index) {
-    shoppingCart.splice(index, 1); // Eliminar el producto del carrito por su índice
-    actualizarListaCompra(); // Actualizar la lista de compra después de eliminar el producto
-}
+      shoppingCart.splice(index, 1);
+      actualizarListaCompra();
+    }
   // Resto del código JavaScript (sin cambios)...
   // ...
 

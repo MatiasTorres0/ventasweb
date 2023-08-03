@@ -4,13 +4,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from .forms import LoginForm, ProductoForm
-from .models import Producto, Categoria
+from .models import Producto, Categoria, Boleta, Conversacion, Mensaje
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-
+from django.views.decorators.csrf import csrf_exempt
+import uuid
+from django.core.files.base import ContentFile
 # Create your views here.
 
 
@@ -149,18 +151,23 @@ def buscar_producto_ajax(request):
     ]
     return JsonResponse(results, safe=False)
 def generar_boleta(request):
-    # Obtener información para la boleta desde la base de datos.
-    # Por ejemplo, aquí se asume que tienes una lista de IDs de productos 'shoppingCart' y
-    # que cada elemento del carrito es un objeto Producto con los campos 'nombre', 'precio', 'descuento'.
-    shopping_cart_ids = [1, 2, 3]  # IDs de los productos seleccionados en el carrito
+    usuario = request.user
+    # Obtener los IDs de los productos seleccionados en el carrito desde la solicitud del usuario
+    shopping_cart_ids = request.POST.getlist('product_ids')  # Obtener los IDs desde el formulario o solicitud
+
+    # Obtener los productos correspondientes a los IDs del carrito
     shoppingCart = [get_object_or_404(Producto, id=product_id) for product_id in shopping_cart_ids]
 
     # Calcular el total a pagar
     total_amount = sum(product.precio * (1 - product.descuento / 100) for product in shoppingCart)
 
+    # Generar un identificador único para el nombre del archivo PDF
+    unique_id = uuid.uuid4().hex
+    file_name = f"boleta_{unique_id}.pdf"
+
     # Generar el PDF de la boleta usando reportlab.
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="boleta.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
 
     p = canvas.Canvas(response, pagesize=letter)
     p.drawString(100, 750, 'BOLETA DE VENTA')
@@ -173,7 +180,13 @@ def generar_boleta(request):
     p.drawString(100, y_position, f'Total a Pagar: ${total_amount:.2f}')
 
     p.save()
+
+    # Crear una instancia de Boleta y guardarla en la base de datos
+    boleta = Boleta(total_a_pagar=total_amount, nro_boleta=unique_id, usuario=usuario)
+    boleta.archivo_pdf.save(file_name, ContentFile(response.content))  
     return response
+
+
 
 def agregar_al_carrito(request, producto_id):
     producto = Producto.objects.get(pk=producto_id)
@@ -232,3 +245,112 @@ def realizar_pago(request):
     mensaje = "¡Pago realizado con éxito! Gracias por tu compra."
 
     return render(request, 'core/pago_exitoso.html', {'mensaje': mensaje})
+
+
+def chat_room(request):
+    return render(request, 'core/chat.html')
+
+# Vista para manejar el envío de mensajes
+def send_message(request):
+    if request.method == 'POST':
+        message = request.POST.get('message')  # Obtener el mensaje del formulario
+
+        # Aquí debes implementar la lógica para enviar el mensaje al personal de la empresa o al usuario que lo necesita.
+        # Puedes utilizar Django Channels o WebSockets para lograr la comunicación en tiempo real.
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+
+# Vista para obtener mensajes anteriores
+def get_messages(request):
+    # Aquí debes implementar la lógica para obtener los mensajes anteriores desde la base de datos o cualquier otra fuente.
+    messages = [
+        {'sender': 'usuario', 'content': 'Hola, necesito ayuda'},
+        {'sender': 'personal', 'content': '¡Hola! ¿En qué puedo ayudarte?'}
+    ]
+
+    return JsonResponse({'messages': messages})
+
+@login_required
+
+def worker_chat(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('chat-room')
+        else:
+            # Mostrar un mensaje de error o realizar otras acciones en caso de autenticación fallida.
+
+            return render(request, 'worker_chat.html')
+
+# views.py
+def evaluation(request):
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        feedback = request.POST.get('feedback')
+
+        # Aquí debes implementar la lógica para almacenar la evaluación en la base de datos o realizar otras acciones necesarias.
+
+        return redirect('chat-room')  # Redirigir a la página de chat después de enviar la evaluación.
+
+    return render(request, 'evaluation.html')
+@login_required
+def nueva_conversacion(request):
+    # Aquí puedes implementar la lógica para crear una nueva conversación en la base de datos.
+    # Esto podría implicar la creación de un nuevo registro en tu modelo Conversacion.
+
+    # Ejemplo: Crear una nueva conversación en la base de datos
+    nueva_conversacion = Conversacion.objects.create()
+
+    # Lógica adicional aquí si es necesario
+
+    # Redirigir a la página de chat después de crear la conversación.
+    return redirect('chat-room')  # Asegúrate de que 'chat-room' sea la URL correcta de tu página de chat.
+
+
+@login_required
+def send_message(request, conversation_id):
+    if request.method == 'POST':
+        message_content = request.POST.get('message')
+
+        # Obtener la conversación asociada al ID
+        conversation = get_object_or_404(Conversacion, id=conversation_id)
+
+        # Crear un nuevo mensaje
+        nuevo_mensaje = Mensaje.objects.create(
+            conversacion=conversation,
+            contenido=message_content,
+            remitente=request.user
+        )
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+
+
+@login_required
+def get_messages(request, conversation_id):
+    if request.method == 'GET':
+        conversation_id = int(request.GET.get('conversation_id'))
+
+        # Obtener la conversación y sus mensajes asociados
+        conversation = get_object_or_404(Conversacion, id=conversation_id)
+        mensajes = Mensaje.objects.filter(conversacion=conversation)
+
+        # Construir una lista de mensajes
+        messages_list = []
+        for mensaje in mensajes:
+            messages_list.append({
+                'sender': mensaje.remitente.username,
+                'content': mensaje.contenido,
+                'timestamp': mensaje.fecha_envio.strftime('%Y-%m-%d %H:%M:%S')
+            })
+
+        return JsonResponse({'messages': messages_list})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'})

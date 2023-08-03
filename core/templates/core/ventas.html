@@ -42,7 +42,7 @@
   }
 
   /* Estilos para las listas */
-  /* ul {
+  ul {
     list-style: none;
     padding: 0;
   }
@@ -53,7 +53,7 @@
     border: 1px solid #ccc;
     margin-bottom: 4px;
     border-radius: 4px;
-  } */
+  }
 
   /* Estilos para el contenedor de la lista de compra */
   #shoppingListContainer {
@@ -98,35 +98,52 @@
 <body>
   <div class="container">
     <h1>Ventas con Búsqueda de Productos</h1>
-    <div>
-      <label for="productSearch">Buscar Producto por Nombre:</label>
-      <input type="text" id="productSearch" oninput="buscarProductos()" placeholder="Ingrese el nombre del producto">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <label for="productSearch">Buscar Producto por Nombre:</label>
+        <input type="text" id="productSearch" oninput="buscarProductos()" placeholder="Ingrese el nombre del producto">
+        <button type="button" onclick="mostrarProductos()" class="btn btn-primary">Mostrar Productos</button>
+      </div>
+      <div class="col-md-6">
+        <label for="manualProductBarcode">Código de Barras:</label>
+        <div class="input-group mb-3">
+          <input type="text" id="manualProductBarcode" class="form-control" placeholder="Ingrese el código de barras">
+          <div class="input-group-append">
+            <button type="button" onclick="agregarProductoPorCodigoBarras()" class="btn btn-primary">Agregar
+              Producto</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <h2>Resultados de la Búsqueda</h2>
+        <ul id="productList"></ul>
+      </div>
+      <div class="col-md-6">
+        <h2>Código de Descuento</h2>
+        <div id="discountSection">
+          <label for="discountCode">Ingrese el Código de Descuento:</label>
+          <div class="input-group mb-3">
+            <input type="text" id="discountCode" class="form-control" placeholder="Ingrese el código de descuento">
+            <div class="input-group-append">
+              <button type="button" onclick="aplicarDescuento()" class="btn btn-primary">Aplicar Descuento</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <button type="button" onclick="mostrarProductos()">Mostrar Productos</button>
-    <h2>Resultados de la Búsqueda</h2>
-    <ul id="productList"></ul>
 
-    <div>
-      <label for="manualProductBarcode">Código de Barras:</label>
-      <input type="text" id="manualProductBarcode" placeholder="Ingrese el código de barras">
-      <button type="button" onclick="agregarProductoPorCodigoBarras()">Agregar Producto</button>
-    </div>
-    <h2>Código de Descuento</h2>
-    <div id="discountSection">
-      <label for="discountCode">Ingrese el Código de Descuento:</label>
-      <input type="text" id="discountCode" placeholder="Ingrese el código de descuento">
-      <button type="button" onclick="aplicarDescuento()">Aplicar Descuento</button>
-    </div>
     <h2>Lista de Compra</h2>
     <div id="shoppingListContainer">
       <ul id="shoppingList"></ul>
 
       <p>Total a Pagar: $<span id="totalAmount">0</span></p>
-      <button type="button" onclick="pagar()">Pagar</button>
+      <button type="button" onclick="pagar()" class="btn btn-primary">Pagar</button>
       <div id="metodoPagoContainer" style="display: none;">
         <label for="metodoPago">Método de Pago:</label>
-        <select id="metodoPago">
+        <select id="metodoPago" class="form-control">
           <option value="efectivo">Efectivo</option>
           <option value="tarjeta_credito">Tarjeta de Crédito</option>
           <option value="tarjeta_debito">Tarjeta de Débito</option>
@@ -134,24 +151,23 @@
         </select>
         <br>
         <label for="montoPagado">Monto Pagado:</label>
-        <input type="number" id="montoPagado" min="0" step="0.01">
+        <input type="number" id="montoPagado" min="0" step="0.01" class="form-control">
         <br>
         <label for="vuelto">Vuelto:</label>
-        <input type="number" id="vuelto" disabled>
+        <input type="number" id="vuelto" disabled class="form-control">
         <br>
         <label for="ivaPagado">IVA Pagado:</label>
-        <input type="number" id="ivaPagado" disabled>
+        <input type="number" id="ivaPagado" disabled class="form-control">
         <br>
       </div>
     </div>
 
     <div class="print-button">
       <a href="{% url 'generar_boleta' %}" target="_blank">
-        <button type="button">Imprimir Boleta</button>
+        <button type="button" class="btn btn-primary">Imprimir Boleta</button>
       </a>
     </div>
   </div>
-
   <script>
     // Resto del código JavaScript (sin cambios)...
     // ...
@@ -182,31 +198,7 @@
         alert("Código de descuento inválido.");
       }
     }
-    function pagar() {
-      // Mostrar el formulario de método de pago
-      const metodoPagoContainer = document.getElementById("metodoPagoContainer");
-      metodoPagoContainer.style.display = "block";
 
-      // Obtener el método de pago seleccionado
-      const metodoPago = document.getElementById("metodoPago").value;
-
-      // Obtener el monto pagado por el cliente
-      const montoPagado = parseFloat(document.getElementById("montoPagado").value);
-
-      // Calcular el vuelto y el IVA pagado
-      const vuelto = montoPagado - totalAmount;
-      const ivaPagado = totalAmount * 0.19;
-
-      // Mostrar el vuelto y el IVA pagado
-      document.getElementById("vuelto").value = vuelto.toFixed(2);
-      document.getElementById("ivaPagado").value = ivaPagado.toFixed(2);
-
-      // Aquí podrías implementar la lógica para procesar el pago y guardar la venta en la base de datos.
-      alert(`Total a Pagar: $${totalAmount.toFixed(2)}\nMétodo de Pago: ${metodoPago}\nMonto Pagado: $${montoPagado.toFixed(2)}\nVuelto: $${vuelto.toFixed(2)}\nIVA Pagado: $${ivaPagado.toFixed(2)}\n¡Gracias por su compra!`);
-
-      shoppingCart = [];
-      actualizarListaCompra();
-    }
   </script>
   <script>
 
@@ -231,82 +223,82 @@
 
 
     function actualizarListaCompra() {
-  const shoppingList = document.getElementById("shoppingList");
-  shoppingList.innerHTML = "";
+      const shoppingList = document.getElementById("shoppingList");
+      shoppingList.innerHTML = "";
 
-  totalAmount = 0.00;
-  shoppingCart.forEach((product, index) => {
-    const listItem = document.createElement("li");
-    const productPrice = parseFloat(product.precio); // Convert to a number
-    if (!isNaN(productPrice)) { // Check if the conversion was successful
-      console.log(`Product Price for ${product.nombre}: ${productPrice}`);
-      const discount = product.descuento || 0; // Use 0 as the default discount if it's not provided
-      listItem.textContent = `${product.nombre} - Precio: $${productPrice.toFixed(2)}`;
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Eliminar";
-      deleteButton.addEventListener("click", () => eliminarProducto(index));
-      listItem.appendChild(deleteButton);
-      shoppingList.appendChild(listItem);
+      totalAmount = 0;
+      shoppingCart.forEach((product, index) => {
+        const listItem = document.createElement("li");
+        const productPrice = parseFloat(product.precio); // Convert to a number
+        if (!isNaN(productPrice)) { // Check if the conversion was successful
+          console.log(`Product Price for ${product.nombre}: ${productPrice}`);
+          const discount = product.descuento || 0; // Use 0 as the default discount if it's not provided
+          listItem.textContent = `${product.nombre} - Precio: $${Math.trunc(productPrice)}`;
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Eliminar";
+          deleteButton.addEventListener("click", () => eliminarProducto(index));
+          listItem.appendChild(deleteButton);
+          shoppingList.appendChild(listItem);
 
-      totalAmount += productPrice * (1 - discount / 100);
-    } else {
-      console.error(`Invalid price for product '${product.nombre}'`);
+          totalAmount += productPrice * (1 - discount / 100);
+        } else {
+          console.error(`Invalid price for product '${product.nombre}'`);
+        }
+      });
+
+      console.log(`Total Amount: ${totalAmount}`);
+
+      document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
     }
-  });
 
-  console.log(`Total Amount: ${totalAmount}`);
+    function pagar() {
+      // Mostrar el formulario de método de pago
+      const metodoPagoContainer = document.getElementById("metodoPagoContainer");
+      metodoPagoContainer.style.display = "block";
 
-  document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
-}
+      // Deshabilitar el botón de "Pagar" para evitar pagos múltiples antes de elegir el método de pago.
+      const pagarButton = document.getElementById("pagarButton");
+      pagarButton.disabled = true;
 
-function pagar() {
-// Mostrar el formulario de método de pago
-const metodoPagoContainer = document.getElementById("metodoPagoContainer");
-metodoPagoContainer.style.display = "block";
+      // Deshabilitar el campo de monto pagado por defecto, ya que el cliente aún no ha ingresado el monto.
+      const montoPagadoInput = document.getElementById("montoPagado");
+      montoPagadoInput.disabled = true;
 
-// Deshabilitar el botón de "Pagar" para evitar pagos múltiples antes de elegir el método de pago.
-const pagarButton = document.getElementById("pagarButton");
-pagarButton.disabled = true;
+      // Obtener el método de pago seleccionado
+      const metodoPago = document.getElementById("metodoPago").value;
 
-// Deshabilitar el campo de monto pagado por defecto, ya que el cliente aún no ha ingresado el monto.
-const montoPagadoInput = document.getElementById("montoPagado");
-montoPagadoInput.disabled = true;
+      if (metodoPago !== "efectivo") {
+        // Si el método de pago no es 'efectivo', autocompletar el campo de monto pagado con el total a pagar
+        montoPagadoInput.value = totalAmount.toFixed(2);
+      } else {
+        // Si el método de pago es 'efectivo', permitir que el cliente ingrese el monto
+        montoPagadoInput.value = ""; // Limpiar el campo
+        montoPagadoInput.disabled = false; // Habilitar el campo para ingresar el monto
+      }
 
-// Obtener el método de pago seleccionado
-const metodoPago = document.getElementById("metodoPago").value;
-
-if (metodoPago !== "efectivo") {
-  // Si el método de pago no es 'efectivo', autocompletar el campo de monto pagado con el total a pagar
-  montoPagadoInput.value = totalAmount.toFixed(2);
-} else {
-  // Si el método de pago es 'efectivo', permitir que el cliente ingrese el monto
-  montoPagadoInput.value = ""; // Limpiar el campo
-  montoPagadoInput.disabled = false; // Habilitar el campo para ingresar el monto
-}
-
-// Hacer una solicitud al servidor
-const formData = new FormData(document.getElementById("formPagar"));
-fetch("/pagar", {
-  method: "post",
-  body: formData
-}).then(response => {
-  if (response.ok) {
-    response.json().then(data => {
-      // Actualizar los campos del formulario con los datos devueltos por el servidor
-      document.getElementById("vuelto").value = data.vuelto;
-      document.getElementById("ivaPagado").value = data.ivaPagado;
-    });
-  } else {
-    alert("Hubo un error al procesar su pago.");
-  }
-});
-}
+      // Hacer una solicitud al servidor
+      const formData = new FormData(document.getElementById("formPagar"));
+      fetch("/pagar", {
+        method: "post",
+        body: formData
+      }).then(response => {
+        if (response.ok) {
+          response.json().then(data => {
+            // Actualizar los campos del formulario con los datos devueltos por el servidor
+            document.getElementById("vuelto").value = data.vuelto;
+            document.getElementById("ivaPagado").value = data.ivaPagado;
+          });
+        } else {
+          alert("Hubo un error al procesar su pago.");
+        }
+      });
+    }
 
 
   // Resto del código JavaScript (sin cambios)...
   // ...
 
-</script>
+  </script>
 
   </script>
   <script>
@@ -317,46 +309,58 @@ fetch("/pagar", {
     // Resto del código JavaScript (sin cambios)...
     // ...
 
+    //    function buscarProductos() {
+    //const searchTerm = document.getElementById("productSearch").value.toLowerCase();
+
+    // Realizar la solicitud AJAX a la URL de Django
+    //fetch(`/buscar-producto-ajax/?search_input=${searchTerm}`)
+    // .then(response => response.json())
+    //.then(data => mostrarResultados(data))
+    // .catch(error => console.error("Error en la solicitud AJAX:", error));
+    //}
+    /*    function agregarProductoPorNombre(event) {
+          const productId = event.target.getAttribute("data-product-id");
+          const selectedProduct = products.find(product => product.id === productId);
+          agregarProducto(selectedProduct);
+        } */
+
+
 
 
     function agregarProductoPorCodigoBarras() {
       const manualProductBarcode = Number(document.getElementById("manualProductBarcode").value);
       const selectedProduct = products.find(product => Number(product.codigo_barras) === manualProductBarcode);
-      if (selectedProduct) {
-        agregarProducto(selectedProduct);
-      } else {
+      if (!selectedProduct) {
         alert("Producto no encontrado en la base de datos.");
+      } else {
+        agregarProducto(selectedProduct);
       }
     }
 
     function mostrarResultados(data) {
+      console.log("Productos recibidos:", data);
+
       products = data;
       const productList = document.getElementById("productList");
       productList.innerHTML = "";
 
       products.forEach(product => {
+        console.log("Procesando producto:", product);
+
         const listItem = document.createElement("li");
         listItem.textContent = `${product.nombre} - Precio: $${product.precio} `;
 
         const addButton = document.createElement("button");
         addButton.textContent = "Agregar al Carrito";
-        addButton.setAttribute("data-product-codigo", product.codigo_barras); // Asegúrate de que este atributo esté configurado.
-        addButton.addEventListener("click", () => agregarProducto(product));
+        addButton.setAttribute("data-product-codigo", product.codigo_barras);
+        addButton.addEventListener("click", () => {
+          console.log("Botón Agregar al Carrito clickeado para producto:", product);
+          agregarProducto(product);
+        });
 
         listItem.appendChild(addButton);
         productList.appendChild(listItem);
       });
-    }
-
-
-    function agregarProducto(product) {
-      shoppingCart.push(product);
-      actualizarListaCompra();
-    }
-
-    function eliminarProducto(index) {
-      shoppingCart.splice(index, 1);
-      actualizarListaCompra();
     }
 
 
@@ -365,6 +369,55 @@ fetch("/pagar", {
     // ...
   </script>
 
+  <script>
+    // Otras funciones existentes...
 
+    function agregarProducto(product) {
+      shoppingCart.push(product);
+      actualizarListaCompra();
+      agregarProductoALaBoleta(product);
+    }
+
+    function eliminarProducto(index) {
+      const product = shoppingCart[index];
+      shoppingCart.splice(index, 1);
+      actualizarListaCompra();
+      quitarProductoDeLaBoleta(product);
+    }
+
+    function agregarProductoALaBoleta(product) {
+      const shoppingList = document.getElementById("shoppingList");
+      const listItem = document.createElement("li");
+      listItem.textContent = `${product.nombre} - Precio: $${Math.trunc(productPrice)}`;
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Eliminar";
+      deleteButton.addEventListener("click", () => eliminarProducto(shoppingCart.indexOf(product)));
+      listItem.appendChild(deleteButton);
+      shoppingList.appendChild(listItem);
+      actualizarTotalAmount();
+    }
+
+    function quitarProductoDeLaBoleta(product) {
+      const shoppingList = document.getElementById("shoppingList");
+      const productIndex = Array.from(shoppingList.children).findIndex(listItem =>
+        listItem.textContent.includes(`${product.nombre} - Precio: $${product.precio.toFixed(2)}`)
+      );
+      if (productIndex !== -1) {
+        shoppingList.removeChild(shoppingList.children[productIndex]);
+        actualizarTotalAmount();
+      }
+    }
+
+    function actualizarTotalAmount() {
+      totalAmount = 0;
+      shoppingCart.forEach(product => {
+        totalAmount += product.precio * (1 - (product.descuento || 0) / 100);
+      });
+      document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
+    }
+
+  // Resto del código JavaScript (sin cambios)...
+  // ...
+  </script>
 
   {% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block contenido %}
+<div id="chat-box">
+    <ul id="message-list">
+        <!-- Los mensajes se agregarán aquí -->
+    </ul>
+</div>
+
+<input type="text" id="message-input" placeholder="Escribe tu mensaje aquí" />
+<button id="send-button">Enviar</button>
+
+<button id="new-conversation-button">Crear nueva conversación</button>
+
+<!-- Agrega enlaces a tus archivos CSS y JavaScript aquí -->
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/chat.js' %}"></script>
+<script>
+    // Agrega el código JavaScript para mostrar y enviar mensajes aquí
+
+    $('#new-conversation-button').on('click', function() {
+        // Agregar aquí la lógica para crear una nueva conversación
+        // Puedes hacer una solicitud AJAX a la vista nueva_conversacion
+        // y luego redirigir a la página del chat con la conversación creada.
+    });
+</script>
+{% endblock %}

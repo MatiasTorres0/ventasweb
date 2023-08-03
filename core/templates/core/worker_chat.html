@@ -1,0 +1,13 @@
+<!-- worker_chat.html -->
+{% extends 'core/base.html' %}
+<style>
+    
+</style>
+{% block contenido %}
+    <h1>Bienvenido, trabajador</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Iniciar sesión</button>
+    </form>
+{% endblock %}

@@ -2,71 +2,118 @@
 {% load static %}
 {% block contenido %}
 <style>
-    /* Estilos para el contenedor de los productos */
-    .productos {
+    /* Estilos para el contenedor principal */
+    .productos-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Cuadrícula flexible */
-        grid-gap: 20px; /* Espacio entre productos */
+        grid-template-columns: 300px 1fr; /* Columnas para filtros y productos */
+        grid-gap: 20px;
+    }
+
+    /* Estilos para el contenedor de los filtros */
+    .filtros-container {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilos para el contenedor de los productos */
+    .productos-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-gap: 20px;
+        justify-items: center;
     }
 
     /* Estilos para cada producto */
     .producto {
-        border: 1px solid #ccc; /* Borde para cada producto */
-        border-radius: 10px; /* Bordes redondeados */
+        border: 1px solid #ccc;
+        border-radius: 10px;
         padding: 20px;
         text-align: center;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     /* Estilos para la imagen del producto */
     .producto img {
         max-width: 100%;
         height: auto;
-        border-radius: 10px; /* Bordes redondeados para la imagen */
+        border-radius: 10px;
     }
 
-    /* Estilos para los botones de modificar y eliminar */
-    .producto a {
-        display: block;
+    /* Estilos para el formulario de filtros */
+    .filtro-form {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .filtro-form label {
+        margin-right: 10px;
+    }
+
+    .filtro-form input[type="number"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .filtro-form button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .filtro-form button[type="submit"] {
+        background-color: #007bff;
+    }
+
+    /* Estilos para los botones de agregar al carrito */
+    .producto button {
         margin-top: 10px;
         padding: 8px 15px;
         border: none;
-        border-radius: 5px; /* Bordes redondeados */
-        color: #fff; /* Color del texto de los botones */
+        border-radius: 5px;
+        color: #fff;
         cursor: pointer;
         text-decoration: none;
-        width: 100%; /* Ocupar todo el ancho del contenedor */
+        width: 100%;
     }
 
-    .producto a:nth-child(1) {
-        background-color: #007bff; /* Color de fondo para el botón "Modificar" */
-    }
-
-    .producto a:nth-child(2) {
-        background-color: #dc3545; /* Color de fondo para el botón "Eliminar" */
+    .producto button {
+        background-color: #007bff;
     }
 </style>
 <h2>Productos</h2>
-<div class="productos">
-    <form method="get" action="{% url 'listado_productos' %}">
-        <label for="precio_min">Precio mínimo:</label>
-        <input type="number" name="precio_min" id="precio_min">
-        <label for="precio_max">Precio máximo:</label>
-        <input type="number" name="precio_max" id="precio_max">
-        <p>Categorías:</p>
-        {% for categoria in categorias %}
-        <input type="checkbox" name="categoria" value="{{ categoria.id }}" id="categoria_{{ categoria.id }}">
-        <label for="categoria_{{ categoria.id }}">{{ categoria.nombre }}</label>
-        <br>
-        {% endfor %}
-        <button type="submit">Filtrar</button>
-    </form>
+<div class="productos-container">
+    <div class="filtros-container">
+        <div class="filtro-form">
+            <form method="get" action="{% url 'listado_productos' %}">
+                <label for="precio_min">Precio mínimo:</label>
+                <input type="number" name="precio_min" id="precio_min">
+                <label for="precio_max">Precio máximo:</label>
+                <input type="number" name="precio_max" id="precio_max">
+                <p>Categorías:</p>
+                {% for categoria in categorias %}
+                <input type="checkbox" name="categoria" value="{{ categoria.id }}" id="categoria_{{ categoria.id }}">
+                <label for="categoria_{{ categoria.id }}">{{ categoria.nombre }}</label>
+                {% endfor %}
+                <button type="submit">Filtrar</button>
+            </form>
+        </div>
+    </div>
 
-    <div class="productos">
+    <div class="productos-list">
         {% for p in productos %}
         <div class="producto">
             <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
             <h3>{{ p.nombre }}</h3>
-            <p><strong>{{ p.precio }}</strong></p>
+            <p><strong>${{ p.precio }}</strong></p>
             <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
                 {% csrf_token %}
                 <button type="submit">Agregar al carrito</button>
@@ -74,10 +121,6 @@
         </div>
         {% endfor %}
     </div>
-    
 </div>
 
-
-
 {% endblock %}
-

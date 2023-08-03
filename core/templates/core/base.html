@@ -34,7 +34,74 @@
     <link rel="stylesheet" href="{% static 'core/'%}css/owl.theme.default.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css"
         media="screen">
+    <style>
+        /* Estilos para el modo oscuro */
+        :root {
+            --bg-color-light: #ffffff;
+            --text-color-light: #000000;
+            --bg-color-dark: #111111;
+            --text-color-dark: #ffffff;
+        }
 
+        body[data-theme="light"] {
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+        }
+
+        body[data-theme="dark"] {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+    </style>
+    <style>
+        /* Estilos para el interruptor de cambio de tema */
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .theme-toggle-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle-button:hover {
+            background-color: #ddd;
+        }
+
+        .theme-menu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: -70px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 999;
+        }
+
+        .theme-menu.show {
+            display: block;
+        }
+
+        .theme-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .theme-menu li {
+            padding: 5px 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -47,8 +114,8 @@
                         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col logo_section">
                             <div class="full">
                                 <div class="center-desk">
-                                    <div class="logo"><a href="{% url 'home' %}"><img src="{% static 'core/'%}img/logo.png"
-                                                style="max-width: 100%;"></a>
+                                    <div class="logo"><a href="{% url 'home' %}"><img
+                                                src="{% static 'core/'%}img/logo.png" style="max-width: 100%;"></a>
                                     </div>
                                 </div>
                             </div>
@@ -61,24 +128,33 @@
                                             <li class="active"><a href="{% url 'home' %}">Home</a></li>
                                             {% if user.is_authenticated %}
                                             <li><a href="{% url 'listado_productos' %}">Productos</a></li>
-
                                             <li><a href="{% url 'nuevo_producto' %}">Nuevo Producto</a></li>
                                             <li><a href="{% url 'index' %}">Contact Us</a></li>
                                             {% endif %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
                                             {% if user.is_authenticated %}
-                                            <li><a href="{% url 'buscar_producto' %}">Buscar</a></li>
                                             <li><a href="{% url 'ventas' %}">Ventas</a></li>
-                                            <li><a href="{% url 'buscar_producto' %}">Consultar</a></li>
                                             <li><a href="{% url 'modificar' %}">Modificar</a></li>
+                                            <li><a href="{% url 'chat-room' %}">Chat</a></li>
                                             {% endif %}
                                             {% if user.is_authenticated %}
                                             <li>
-                                            <a href="#">{{ user.username}}</a>
+                                                <a href="#">{{ user.username}}</a>
                                             </li>
                                             <li><a href="{% url 'logout' %}">Cerrar sesion</a></li>
-                                           {% endif %}
-                                           
+                                            {% endif %}
+                                            <div class="theme-toggle">
+                                                <div class="theme-toggle-button"
+                                                    onclick="toggleThemeMenu()">&#9776;</div>
+                                                <div class="theme-menu" id="themeMenu">
+                                                    <ul>
+                                                        <li><a href="javascript:void(0)"
+                                                                onclick="toggleTheme('light')">Tema Claro</a></li>
+                                                        <li><a href="javascript:void(0)"
+                                                                onclick="toggleTheme('dark')">Tema Oscuro</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </ul>
                                     </nav>
                                 </div>
@@ -87,7 +163,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="principal">
                 <br>
                 {% block contenido %}
@@ -143,11 +219,32 @@
             </script>
             <!-- google map js -->
             <script
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8eaHt9Dh5H57Zh0xVTqxVdBFCvFMqFjQ&callback=initMap"></script>
+                src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
             <!-- end google map js -->
 
-
-
+            <script>
+                // Función para cambiar entre temas claro y oscuro
+                function toggleTheme(theme) {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+        
+                // Función para mostrar/ocultar el menú de cambio de tema
+                function toggleThemeMenu() {
+                    const themeMenu = document.getElementById('themeMenu');
+                    themeMenu.classList.toggle('show');
+                }
+        
+                // Cerrar el menú cuando se haga clic fuera de él
+                window.addEventListener('click', function (event) {
+                    const themeMenu = document.getElementById('themeMenu');
+                    if (!event.target.matches('.theme-toggle-button')) {
+                        if (themeMenu.classList.contains('show')) {
+                            themeMenu.classList.remove('show');
+                        }
+                    }
+                });
+            </script>
+        </script>
 
 </body>
 
