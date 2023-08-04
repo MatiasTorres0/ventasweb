@@ -129,12 +129,14 @@
                                             {% if user.is_authenticated %}
                                             <li><a href="{% url 'listado_productos' %}">Productos</a></li>
                                             <li><a href="{% url 'nuevo_producto' %}">Nuevo Producto</a></li>
+                                            <li><a href="{% url 'cargar_productos' %}">Subir Excel</a></li>
                                             <li><a href="{% url 'index' %}">Contact Us</a></li>
                                             {% endif %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
                                             {% if user.is_authenticated %}
                                             <li><a href="{% url 'ventas' %}">Ventas</a></li>
                                             <li><a href="{% url 'modificar' %}">Modificar</a></li>
+                                            <li><a href="{% url 'escanear_codigo_barras' %}">Pan</a></li>
                                             <li><a href="{% url 'chat-room' %}">Chat</a></li>
                                             {% endif %}
                                             {% if user.is_authenticated %}
@@ -144,17 +146,16 @@
                                             <li><a href="{% url 'logout' %}">Cerrar sesion</a></li>
                                             {% endif %}
                                             <div class="theme-toggle">
-                                                <div class="theme-toggle-button"
-                                                    onclick="toggleThemeMenu()">&#9776;</div>
+                                                <div class="theme-toggle-button" onclick="toggleThemeMenu()">&#9776;
+                                                </div>
                                                 <div class="theme-menu" id="themeMenu">
                                                     <ul>
-                                                        <li><a href="javascript:void(0)"
-                                                                onclick="toggleTheme('light')">Tema Claro</a></li>
-                                                        <li><a href="javascript:void(0)"
-                                                                onclick="toggleTheme('dark')">Tema Oscuro</a></li>
+                                                        <li><a href="javascript:void(0)" onclick="toggleTheme('light')">Tema Claro</a></li>
+                                                        <li><a href="javascript:void(0)" onclick="toggleTheme('dark')">Tema Oscuro</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
+
                                         </ul>
                                     </nav>
                                 </div>
@@ -218,8 +219,7 @@
                 }
             </script>
             <!-- google map js -->
-            <script
-                src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
             <!-- end google map js -->
 
             <script>
@@ -227,13 +227,13 @@
                 function toggleTheme(theme) {
                     document.documentElement.setAttribute('data-theme', theme);
                 }
-        
+
                 // Función para mostrar/ocultar el menú de cambio de tema
                 function toggleThemeMenu() {
                     const themeMenu = document.getElementById('themeMenu');
                     themeMenu.classList.toggle('show');
                 }
-        
+
                 // Cerrar el menú cuando se haga clic fuera de él
                 window.addEventListener('click', function (event) {
                     const themeMenu = document.getElementById('themeMenu');
@@ -242,9 +242,22 @@
                             themeMenu.classList.remove('show');
                         }
                     }
+
+                }
+
+
+                );
+
+                // Cambiar el tema al hacer clic en un elemento del menú
+                document.querySelectorAll('.theme-menu a').forEach(function (link) {
+                    link.onclick = function () {
+                        const theme = link.getAttribute('data-theme');
+                        toggleTheme(theme);
+                    };
                 });
             </script>
-        </script>
+
+            </script>
 
 </body>
 

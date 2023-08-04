@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+
+<title>Escanear Código de Barras</title>
+
+<h1>Escanear Código de Barras</h1>
+
+<form method="get">
+    <label for="codigo_barras">Ingresa o escanea el código de barras:</label>
+    <input type="text" id="codigo_barras" name="codigo_barras">
+    <button type="submit">Buscar</button>
+</form>
+
+{% if producto %}
+<h2>Producto encontrado:</h2>
+<p>Nombre: {{ producto.nombre }}</p>
+<p>Descripción: {{ producto.descripcion }}</p>
+
+{% if variantes %}
+<h3>Variantes de Precio:</h3>
+<ul>
+    {% for variante in variantes %}
+    <li>
+        Precio: {{ variante.precio }} pesos chilenos
+        {% if variante.peso_kilo %}
+        | Peso por kilo: {{ variante.peso_kilo }} kg
+        {% endif %}
+        {% if variante.unidad %}
+        | Unidad: {{ variante.unidad }}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% else %}
+<p>No se encontró ningún producto con el código de barras ingresado.</p>
+{% endif %}
+
+{% endblock %}

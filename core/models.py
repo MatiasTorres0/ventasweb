@@ -10,6 +10,18 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class Unidad_medida(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class Tamano(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
 class Producto(models.Model):
     codigo_barras = models.CharField(max_length=200, null=True)
     nombre = models.CharField(max_length=200)
@@ -18,8 +30,8 @@ class Producto(models.Model):
     stock = models.IntegerField( null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     imagen = models.FileField(upload_to='productos/', blank=True, null=True, verbose_name="Imagen o Video")
-    unidad_medida = models.CharField(max_length=20, null=True)
-    tamano = models.CharField(max_length=50, null=True)
+    unidad_medida = models.ForeignKey(Unidad_medida, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    tamano = models.ForeignKey(Tamano, on_delete=models.CASCADE, default=None, blank=True, null=True)
     oferta = models.CharField(max_length=100, null=True)
     descuento = models.PositiveIntegerField(default=0)
 
@@ -54,3 +66,12 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return f'Mensaje de {self.remitente} en Conversación {self.conversacion.id}'
+    
+
+class VariantePrecio(models.Model):
+    codigo_barras = models.CharField(max_length=200, null=True)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    precio = models.IntegerField()  # Precio en pesos chilenos
+    peso_kilo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    unidad = models.CharField(max_length=10, null=True, blank=True)
+

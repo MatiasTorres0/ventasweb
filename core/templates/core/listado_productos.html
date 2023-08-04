@@ -5,7 +5,8 @@
     /* Estilos para el contenedor principal */
     .productos-container {
         display: grid;
-        grid-template-columns: 300px 1fr; /* Columnas para filtros y productos */
+        grid-template-columns: 300px 1fr;
+        /* Columnas para filtros y productos */
         grid-gap: 20px;
     }
 
@@ -88,6 +89,19 @@
     .producto button {
         background-color: #007bff;
     }
+
+    /* Estilos para el contenedor de productos si hay solo uno */
+    /* Estilos para el contenedor de productos si hay solo uno o menos de 16 */
+    /* Estilos para el contenedor de productos si hay solo uno o menos de 16 */
+    .productos-list.single-product {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    /* Ajustar el tamaño del contenedor si hay solo uno o menos de 16 productos */
+    .productos-container.single-product {
+        grid-template-columns: 300px 1fr;
+    }
 </style>
 <h2>Productos</h2>
 <div class="productos-container">
@@ -110,17 +124,45 @@
 
     <div class="productos-list">
         {% for p in productos %}
-        <div class="producto">
-            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
-            <h3>{{ p.nombre }}</h3>
-            <p><strong>${{ p.precio }}</strong></p>
-            <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
-                {% csrf_token %}
-                <button type="submit">Agregar al carrito</button>
-            </form>
+        <div class="card producto">
+            <img class="card-img-top" src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ p.nombre }}</h5>
+                <p class="card-text"><strong>${{ p.precio }}</strong></p>
+                <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+                </form>
+            </div>
         </div>
         {% endfor %}
     </div>
-</div>
 
-{% endblock %}
+    <div class="paginator">
+        <ul class="pagination">
+            {% if productos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Primera</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ productos.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Página {{ productos.number }} de {{ productos.paginator.num_pages }}.
+                </span>
+            </li>
+
+            {% if productos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ productos.next_page_number }}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ productos.paginator.num_pages }}">Última &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endblock %}

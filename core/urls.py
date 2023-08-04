@@ -26,4 +26,10 @@ urlpatterns = [
     path('nueva-conversacion/', views.nueva_conversacion, name='nueva_conversacion'),
     path('evaluation/', views.evaluation, name='evaluation'),
     path('worker_chat/', LoginView.as_view(template_name='worker_chat.html'), name='worker-chat'),
+    path('cargar-productos/', views.cargar_productos_desde_excel, name='cargar_productos'),
+    path('actualizar-informacion-desde-excel/', views.actualizar_informacion_desde_excel, name='actualizar_informacion_desde_excel'),
+    path('cargar-categorias/', views.cargar_categorias_desde_excel, name='cargar_categorias'),
+    path('cargar-unidades/', views.cargar_unidades_desde_excel, name='cargar_unidades'),
+    path('cargar-tamanos/', views.cargar_tamanos_desde_excel, name='cargar_tamanos'),
+    path('escanear_codigo_barras/', views.escanear_codigo_barras, name='escanear_codigo_barras'),
 ]

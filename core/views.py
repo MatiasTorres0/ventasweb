@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from .forms import LoginForm, ProductoForm
-from .models import Producto, Categoria, Boleta, Conversacion, Mensaje
+from .models import Producto, Categoria, Boleta, Conversacion, Mensaje, Tamano, Unidad_medida, VariantePrecio
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -13,6 +13,9 @@ from reportlab.pdfgen import canvas
 from django.views.decorators.csrf import csrf_exempt
 import uuid
 from django.core.files.base import ContentFile
+from openpyxl import load_workbook
+
+
 # Create your views here.
 
 
@@ -49,6 +52,8 @@ def logout_view(request):
 def index(request):
     return render(request, "core/index.html")
 
+from django.core.paginator import Paginator
+
 @login_required
 def listado_productos(request):
     productos = Producto.objects.all()
@@ -70,14 +75,21 @@ def listado_productos(request):
     if categorias_seleccionadas:
         productos = productos.filter(categoria__in=categorias_seleccionadas)
 
+    # Agregar paginador
+    paginator = Paginator(productos, 16)  # Mostrar 10 productos por página
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+
     for producto in productos:
         if not producto.imagen:
             producto.imagen = imagen_predeterminada_url
 
     context = {
-        'productos': productos
+        'productos': productos,
+        'categorias': categorias
     }
-    return render(request, 'core/listado_productos.html', {'productos': productos, 'categorias': categorias})
+    return render(request, 'core/listado_productos.html', context)
+
 
 @login_required
 def nuevo_producto(request):
@@ -102,7 +114,7 @@ def modificar_producto(request, id):
         if formulario.is_valid():
             formulario.save()
             messages.success(request, "El producto fue modificado Correctamente")
-            return redirect("listado_productos")
+            return redirect("modificar")
     return render(request, 'core/modificar_producto.html', data)
 @login_required
 def eliminar_producto(request, id):
@@ -220,7 +232,13 @@ def modificar(request):
     if categorias_seleccionadas:
         productos = productos.filter(categoria__in=categorias_seleccionadas)
 
-    return render(request, 'core/modificar.html', {'productos': productos, 'categorias': categorias})
+    # Agregar paginador
+    paginator = Paginator(productos, 16)  # Mostrar 16 productos por página
+    page_number = request.GET.get('page')
+    productos_paginados = paginator.get_page(page_number)
+
+    return render(request, 'core/modificar.html', {'productos': productos_paginados, 'categorias': categorias})
+
 # firebase login
 # firebase init
 # firebase deploy
@@ -230,10 +248,15 @@ def carrito_ventas(request):
     carrito_ids = request.session.get('carrito', [])
 
     for producto_id in carrito_ids:
-        producto = Producto.objects.get(pk=producto_id)
-        carrito_productos.append(producto)
+        try:
+            producto = Producto.objects.get(pk=producto_id)
+            carrito_productos.append(producto)
+        except Producto.DoesNotExist:
+            # Manejar el caso en el que el producto no existe
+            pass  # Puedes mostrar un mensaje de error o simplemente omitir el producto
 
     return render(request, 'core/carrito_ventas.html', {'carrito_productos': carrito_productos})
+
 
 
 def realizar_pago(request):
@@ -354,3 +377,141 @@ def get_messages(request, conversation_id):
         return JsonResponse({'messages': messages_list})
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+
+def cargar_productos_desde_excel(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+
+        # Cargar el archivo Excel
+        wb = load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+        default_categoria = Categoria.objects.get(nombre='Detergente')
+
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            codigo_barras = row[0]
+            nombre = row[1]
+            precio = row[2]
+            stock = row[3]
+            descuento = row[4] or 0
+
+            # Crear un nuevo objeto Producto y guardarlo en la base de datos
+            producto = Producto(
+                codigo_barras=codigo_barras,
+                nombre=nombre,
+                precio=precio,
+                stock=stock,
+                descuento=descuento,
+                categoria=default_categoria
+            )
+            producto.save()
+
+        return redirect('listado_productos') 
+
+    return render(request, 'core/cargar_productos.html')
+
+
+
+def actualizar_informacion_desde_excel(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+
+        # Cargar el archivo Excel
+        wb = load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            codigo_barras = row[0]
+            nuevo_nombre = row[1]
+            nuevo_precio = row[2]
+            nuevo_stock = row[3]
+            nuevo_descuento = row[4] or 0
+            try:
+                # Obtener el producto existente por código de barras
+                producto = Producto.objects.get(codigo_barras=codigo_barras)
+                # Actualizar el nombre y el precio del producto
+                producto.nombre = nuevo_nombre
+                producto.precio = nuevo_precio
+                producto.stock = nuevo_stock
+                producto.descuento =nuevo_descuento
+                producto.save()
+            except Producto.DoesNotExist:
+                pass  # Ignorar productos que no existen en la base de datos
+
+        return redirect('listado_productos')  # Redirigir a la lista de productos
+
+    return render(request, 'actualizar_informacion_desde_excel.html')
+
+
+def cargar_categorias_desde_excel(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+
+        # Cargar el archivo Excel
+        wb = load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            nombre_categoria = row[0]
+
+            # Crear un nuevo objeto Categoria y guardarlo en la base de datos
+            categoria = Categoria(nombre=nombre_categoria)
+            categoria.save()
+
+        return redirect('listado_productos') 
+
+    return render(request, 'core/cargar_categorias.html')
+
+
+def cargar_unidades_desde_excel(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+
+        # Cargar el archivo Excel
+        wb = load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            nombre_unidad = row[0]
+
+            # Crear un nuevo objeto Unidad_medida y guardarlo en la base de datos
+            unidad = Unidad_medida(nombre=nombre_unidad)
+            unidad.save()
+
+        return redirect('listado_productos') 
+
+    return render(request, 'core/cargar_unidades.html')
+
+
+def cargar_tamanos_desde_excel(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+
+        # Cargar el archivo Excel
+        wb = load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            nombre_tamano = row[0]
+
+            # Crear un nuevo objeto Tamano y guardarlo en la base de datos
+            tamano = Tamano(nombre=nombre_tamano)
+            tamano.save()
+
+        return redirect('listado_productos') 
+
+    return render(request, 'core/cargar_tamanos.html')
+
+
+def escanear_codigo_barras(request):
+    codigo_barras = request.GET.get('codigo_barras', None)
+    producto = None
+    variantes = []
+
+    if codigo_barras:
+        try:
+            producto = Producto.objects.get(codigo_barras=codigo_barras)
+            variantes = VariantePrecio.objects.filter(producto=producto)
+        except Producto.DoesNotExist:
+            pass
+
+    return render(request, 'core/escanear_codigo_barras.html', {'producto': producto, 'variantes': variantes})
