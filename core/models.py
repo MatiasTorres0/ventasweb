@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 
 
 class Categoria(models.Model):
@@ -75,3 +75,23 @@ class VariantePrecio(models.Model):
     peso_kilo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     unidad = models.CharField(max_length=10, null=True, blank=True)
 
+
+
+class Ticket(models.Model):
+    STATUS_CHOICES = (
+        ('Open', 'Abierto'),
+        ('In Progress', 'En Progreso'),
+        ('Closed', 'Cerrado'),
+    )
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
+    respuesta = models.TextField(blank=True, null=True)  # Campo para almacenar la respuesta
+
+    def __str__(self):
+        return self.name

@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
-from .views import home, login, index, listado_productos, nuevo_producto, modificar_producto, eliminar_producto, agregar
+from .views import home, login, index, listado_productos, nuevo_producto, modificar_producto, eliminar_producto, agregar, crear, soporte
 from . import views
 urlpatterns = [
     path('', home, name="home"),
@@ -32,4 +32,8 @@ urlpatterns = [
     path('cargar-unidades/', views.cargar_unidades_desde_excel, name='cargar_unidades'),
     path('cargar-tamanos/', views.cargar_tamanos_desde_excel, name='cargar_tamanos'),
     path('escanear_codigo_barras/', views.escanear_codigo_barras, name='escanear_codigo_barras'),
+    path('crear/', crear, name="crear"),
+    path('soporte/', soporte, name="soporte"),
+    path('create_ticket/', views.create_ticket, name='create_ticket'),
+    path('responder_ticket/<int:ticket_id>/', views.responder_ticket, name='responder_ticket'),
 ]

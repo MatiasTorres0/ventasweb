@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from .forms import LoginForm, ProductoForm
-from .models import Producto, Categoria, Boleta, Conversacion, Mensaje, Tamano, Unidad_medida, VariantePrecio
+from .models import Producto, Categoria, Boleta, Conversacion, Mensaje, Tamano, Unidad_medida, VariantePrecio, Ticket
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -14,6 +14,12 @@ from django.views.decorators.csrf import csrf_exempt
 import uuid
 from django.core.files.base import ContentFile
 from openpyxl import load_workbook
+import barcode
+from barcode import generate
+from barcode.writer import ImageWriter
+from io import BytesIO
+from django.http import HttpResponse
+from django.core.files.base import ContentFile
 
 
 # Create your views here.
@@ -21,6 +27,23 @@ from openpyxl import load_workbook
 
 def home(request):
     return render(request, "core/home.html")
+
+
+def crear(request):
+    if request.method == 'POST':
+        value = request.POST.get('barcode_value', '')
+
+        # Genera el código de barras en formato CODE128
+        barcode_class = barcode.get_barcode_class('code128')
+        code = barcode_class(value, writer=ImageWriter())
+        buffer = BytesIO()
+        code.write(buffer)
+        code_img = ContentFile(buffer.getvalue())
+
+        context = {'code_img': code_img}
+        return render(request, 'core/crear.html', context)
+
+    return render(request, 'core/crear.html')
 
 
 def login(request):
@@ -515,3 +538,39 @@ def escanear_codigo_barras(request):
             pass
 
     return render(request, 'core/escanear_codigo_barras.html', {'producto': producto, 'variantes': variantes})
+
+
+
+def soporte(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        email = request.POST['email']
+        phone_number = request.POST['phone_number']
+        message = request.POST['message']
+        # Crea el ticket en la base de datos
+        ticket = Ticket.objects.create(name=name, email=email, phone_number=phone_number, message=message)
+        # Redirige a donde desees después de crear el ticket
+        return redirect('core/home')
+    return render(request, 'core/soporte.html')
+
+
+def create_ticket(request):
+    tickets = Ticket.objects.all()
+    context = {'tickets': tickets}
+    return render(request, "core/create_ticket.html", context)
+
+def responder_ticket(request, ticket_id):
+    ticket = Ticket.objects.get(id=ticket_id)
+    if request.method == 'POST':
+        respuesta = request.POST['respuesta']
+        estado = request.POST['estado']
+        
+        # Actualiza el campo de respuesta y el estado en el ticket
+        ticket.respuesta = respuesta
+        ticket.status = estado
+        ticket.save()
+        
+        return redirect('create_ticket')  # Ajusta la redirección según tu necesidad
+    
+    context = {'ticket': ticket}
+    return render(request, 'core/responder_ticket.html', context)

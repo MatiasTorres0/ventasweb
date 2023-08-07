@@ -130,7 +130,7 @@
                                             <li><a href="{% url 'listado_productos' %}">Productos</a></li>
                                             <li><a href="{% url 'nuevo_producto' %}">Nuevo Producto</a></li>
                                             <li><a href="{% url 'cargar_productos' %}">Subir Excel</a></li>
-                                            <li><a href="{% url 'index' %}">Contact Us</a></li>
+                                            <li><a href="{% url 'soporte' %}">Contact Us</a></li>
                                             {% endif %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
                                             {% if user.is_authenticated %}
@@ -138,6 +138,9 @@
                                             <li><a href="{% url 'modificar' %}">Modificar</a></li>
                                             <li><a href="{% url 'escanear_codigo_barras' %}">Pan</a></li>
                                             <li><a href="{% url 'chat-room' %}">Chat</a></li>
+                                            <li><a href="{% url 'crear' %}">Crear Codigo de barras</a></li>
+                                            <li><a href="{% url 'create_ticket' %}">Ver Tickets</a></li>
+                                            <li><a href="{% url 'index' %}">Prueba</a></li>
                                             {% endif %}
                                             {% if user.is_authenticated %}
                                             <li>

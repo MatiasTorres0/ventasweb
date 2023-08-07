@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+<title>Tickets de Soporte</title>
+{% block contenido %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Tickets de Soporte</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th><strong>Nombre</strong></th>
+                            <th><strong>Correo Electrónico</strong></th>
+                            <th><strong>Número de Teléfono</strong></th>
+                            <th><strong>Mensaje</strong></th>
+                            <th><strong>Estado</strong></th>
+                            <th><strong>Creado en</strong></th>
+                            <th><strong>Acciones</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td><strong>{{ ticket.name }}</strong></td>
+                            <td><strong>{{ ticket.email }}</strong></td>
+                            <td><strong>{{ ticket.phone_number }}</strong></td>
+                            <td><strong>{{ ticket.message }}</strong></td>
+                            <td><strong>{{ ticket.status }}</strong></td>
+                            <td><strong>{{ ticket.created_at }}</strong></td>
+                            <td>
+                                <a href="{% url 'responder_ticket' ticket.id %}" class="btn btn-primary">Responder</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

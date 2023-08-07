@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+<title>Responder Ticket</title>
+{% block contenido %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Responder Ticket</h2>
+        </div>
+        <div class="card-body">
+            <h4>Ticket: {{ ticket.name }}</h4>
+            <p><strong>Mensaje:</strong></p>
+            <p>{{ ticket.message }}</p>
+            <hr>
+            <h4>Respuesta actual:</h4>
+            <p>{{ ticket.respuesta }}</p>
+            <hr>
+            <form action="{% url 'responder_ticket' ticket.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="respuesta">Respuesta:</label>
+                    <textarea class="form-control" id="respuesta" name="respuesta" rows="5" required>{{ ticket.respuesta }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="estado">Cambiar Estado:</label>
+                    <select class="form-control" id="estado" name="estado">
+                        <option value="Open" {% if ticket.status == 'Open' %}selected{% endif %}>Abierto</option>
+                        <option value="In Progress" {% if ticket.status == 'In Progress' %}selected{% endif %}>En Progreso</option>
+                        <option value="Closed" {% if ticket.status == 'Closed' %}selected{% endif %}>Cerrado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar Respuesta y Cambiar Estado</button>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
