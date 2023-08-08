@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block contenido %}
+<div class="page-links">
+    <div class="card page-link">
+        <div class="card-body">
+            <i class="fas fa-newspaper"></i>
+            <h2 class="card-title">Crear Noticia</h2>
+            <a class="btn btn-primary" href="{% url 'crear_noticia' %}">Crear</a>
+        </div>
+    </div>
+    <div class="card page-link">
+        <div class="card-body">
+            <i class="fas fa-box"></i>
+            <h2 class="card-title">Crear Producto</h2>
+            <a class="btn btn-primary" href="{% url 'nuevo_producto' %}">Crear</a>
+        </div>
+    </div>
+    <div class="card page-link">
+        <div class="card-body">
+            <i class="fas fa-newspaper"></i>
+            <h2 class="card-title">Visualizar Noticias</h2>
+            <a class="btn btn-primary" href="{% url 'lista_noticias' %}">Ver</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

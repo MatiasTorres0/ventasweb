@@ -3,14 +3,12 @@
 {% load static %}
 
 {% block contenido %}
-
-
 <div class="layout_padding gallery_section">
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
                 <div class="gallery_main">
-                    <h1 class="gallery_taital"><strong><span class="our_text">Envia tu</span>Ticket</strong></h1>
+                    <h1 class="gallery_taital"><strong><span class="our_text">Get in</span>Touch</strong></h1>
                 </div>
             </div>
         </div>
@@ -19,23 +17,23 @@
                 <div class="col-md-6">
                     <div class="input_main">
                         <div class="container">
-                            <form action="{% url 'create_ticket' %}" method="post">
+                            <form action="{% url 'soporte' %}" method="post">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <input type="text" class="email-bt" placeholder="Agregue su nombre" name="name">
+                                    <input type="text" class="email-bt" placeholder="YOUR NAME" name="name" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="email-bt" placeholder="EMAIL" name="email">
+                                    <input type="email" class="email-bt" placeholder="EMAIL" name="email" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="email-bt" placeholder="Número de contacto" name="phone_number">
+                                    <input type="tel" class="email-bt" placeholder="PHONE NUMBER" name="phone_number" required>
                                 </div>
                                 <div class="form-group">
-                                    <textarea class="massage-bt" placeholder="Mensaje" rows="5" id="comment"
-                                        name="message"></textarea>
+                                    <textarea class="massage-bt" placeholder="MESSAGE" rows="5" id="comment" name="message"
+                                        required></textarea>
                                 </div>
                                 <div class="send_btn">
-                                    <button type="submit" class="main_bt">Enviar</button>
+                                    <button type="submit" class="main_bt">SEND</button>
                                 </div>
                             </form>
                         </div>
@@ -50,6 +48,5 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}
+

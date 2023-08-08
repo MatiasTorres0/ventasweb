@@ -36,4 +36,13 @@ urlpatterns = [
     path('soporte/', soporte, name="soporte"),
     path('create_ticket/', views.create_ticket, name='create_ticket'),
     path('responder_ticket/<int:ticket_id>/', views.responder_ticket, name='responder_ticket'),
+    path('productos/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
+    path('registrar/', views.registro_usuario, name="registro_usuario"),
+    path('reparto/', views.reparto_list, name='reparto_list'),
+    path('reparto/<int:pk>/', views.reparto_detail, name='reparto_detail'),
+    path('reparto/crear/', views.reparto_create, name='reparto_create'),
+    path('crearnoticia/', views.crear_noticia, name='crear_noticia'),
+    path('lista/', views.lista_noticias, name='lista_noticias'),
+    path('creararticulo/', views.creararticulo, name="creararticulo"),
+    path('detalle_noticia/<int:noticia_id>/', views.detalle_noticia, name='detalle_noticia'),
 ]

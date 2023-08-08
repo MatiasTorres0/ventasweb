@@ -3,8 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
-from .forms import LoginForm, ProductoForm
-from .models import Producto, Categoria, Boleta, Conversacion, Mensaje, Tamano, Unidad_medida, VariantePrecio, Ticket
+from .forms import LoginForm, ProductoForm, CustomUserForm, NoticiaForm
+from .models import Producto, Categoria, Boleta, Conversacion, Mensaje, Tamano, Unidad_medida, VariantePrecio, Ticket, Noticia
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -20,6 +20,15 @@ from barcode.writer import ImageWriter
 from io import BytesIO
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
+import random
+import smtplib
+from email.mime.text import MIMEText
+from django.utils import timezone
+from django.core.mail import EmailMessage
+from .models import Reparto
+from .forms import RepartoForm
+
+
 
 
 # Create your views here.
@@ -27,6 +36,9 @@ from django.core.files.base import ContentFile
 
 def home(request):
     return render(request, "core/home.html")
+
+def creararticulo(request):
+    return render(request, "core/creararticulo.html")
 
 
 def crear(request):
@@ -77,6 +89,7 @@ def index(request):
 
 from django.core.paginator import Paginator
 
+
 @login_required
 def listado_productos(request):
     productos = Producto.objects.all()
@@ -99,7 +112,7 @@ def listado_productos(request):
         productos = productos.filter(categoria__in=categorias_seleccionadas)
 
     # Agregar paginador
-    paginator = Paginator(productos, 16)  # Mostrar 10 productos por página
+    paginator = Paginator(productos, 16)  # Mostrar 16 productos por página
     page_number = request.GET.get('page')
     productos = paginator.get_page(page_number)
 
@@ -107,10 +120,15 @@ def listado_productos(request):
         if not producto.imagen:
             producto.imagen = imagen_predeterminada_url
 
+    # Obtener sugerencias de productos aleatorios
+    sugerencias = random.sample(list(Producto.objects.exclude(id__in=[p.id for p in productos])), 6)
+
     context = {
         'productos': productos,
-        'categorias': categorias
+        'categorias': categorias,
+        'sugerencias': sugerencias
     }
+    
     return render(request, 'core/listado_productos.html', context)
 
 
@@ -547,11 +565,20 @@ def soporte(request):
         email = request.POST['email']
         phone_number = request.POST['phone_number']
         message = request.POST['message']
-        # Crea el ticket en la base de datos
-        ticket = Ticket.objects.create(name=name, email=email, phone_number=phone_number, message=message)
+        try:
+            # Crea el ticket en la base de datos
+            new_ticket = Ticket.objects.create(name=name, email=email, phone_number=phone_number, message=message)
+            # Salva el ticket en la base de datos
+            new_ticket.save()
+            print('Ticket guardado:', new_ticket.name)
+        except Exception as e:
+            print(e)
+            return HttpResponse('Error al guardar el ticket')
         # Redirige a donde desees después de crear el ticket
-        return redirect('core/home')
+        return redirect('home')
     return render(request, 'core/soporte.html')
+
+
 
 
 def create_ticket(request):
@@ -574,3 +601,106 @@ def responder_ticket(request, ticket_id):
     
     context = {'ticket': ticket}
     return render(request, 'core/responder_ticket.html', context)
+
+
+def detalle_producto(request, producto_id):
+    detalle_producto = get_object_or_404(Producto, id=producto_id)
+    context = {
+        'detalle_producto': detalle_producto
+    }
+    return render(request, 'core/listado_productos.html', context)
+
+
+def registro_usuario(request):
+    data = {
+        'form': CustomUserForm()
+    }
+
+    if request.method == 'POST':
+            formulario = CustomUserForm(request.POST)
+            if formulario.is_valid():
+                formulario.save();
+                username = formulario.cleaned_data['username']
+                password = formulario.cleaned_data['password1']
+                user = authenticate[username==username, password==password]
+                login(request, user)
+                return redirect(to='home')
+    return render(request, "registration/login.html", data)
+
+def send_email(ticket):
+    subject = 'Estado del ticket cambiado'
+    body = 'El estado del ticket {id} se ha cambiado a {status}.'.format(id=ticket.id, status=ticket.status)
+
+    email_from = 'matiasjtorresh@gmail.com'
+    email_to = ticket.email
+
+    # Usamos el módulo email para crear el mensaje
+    msg = EmailMessage(subject, body, email_from, [email_to])
+    msg.send()
+
+def send_email_reply(ticket, response):
+    subject = 'Respuesta al ticket'
+    body = 'La respuesta al ticket {id} es: {response}.'.format(id=ticket.id, response=response)
+
+    email_from = 'matiasjtorresh@gmail.com'
+    email_to = ticket.email
+
+    # Usamos el módulo email para crear el mensaje
+    msg = EmailMessage(subject, body, email_from, [email_to])
+    msg.send()
+
+def change_status(ticket, new_status):
+    ticket.status = new_status
+    # Actualizamos el campo updated_at con la fecha y hora actual
+    ticket.updated_at = timezone.now()
+    ticket.save()
+    # Envia un correo electrónico al usuario notificando el cambio de estado
+    send_email(ticket)
+
+def reply_ticket(ticket, response):
+    ticket.response = response
+    # Actualizamos el campo updated_at con la fecha y hora actual
+    ticket.updated_at = timezone.now()
+    ticket.save()
+    # Envia un correo electrónico al usuario notificando la respuesta si no es nula o vacía
+    if response:
+        send_email_reply(ticket, response)
+
+
+def reparto_list(request):
+    repartos = Reparto.objects.all()
+    return render(request, 'core/reparto_list.html', {'repartos': repartos})
+
+def reparto_detail(request, pk):
+    reparto = get_object_or_404(Reparto, pk=pk)
+    return render(request, 'reparto/reparto_detail.html', {'reparto': reparto})
+
+def reparto_create(request):
+    if request.method == 'POST':
+        form = RepartoForm(request.POST)
+        if form.is_valid():
+            reparto = form.save()
+            return redirect('core/reparto_detail', pk=reparto.pk)
+    else:
+        form = RepartoForm()
+    return render(request, 'core/reparto_create.html', {'form': form})
+
+
+
+def crear_noticia(request):
+    if request.method == 'POST':
+        form = NoticiaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_noticias')
+    else:
+        form = NoticiaForm()
+    return render(request, 'core/crear_noticia.html', {'form': form})
+
+def lista_noticias(request):
+    noticias = Noticia.objects.all().order_by('-fecha_publicacion')
+    return render(request, 'core/lista_noticias.html', {'noticias': noticias})
+
+def detalle_noticia(request, noticia_id):
+    noticia = get_object_or_404(Noticia, pk=noticia_id)
+    return render(request, 'core/detalle_noticia.html', {'noticia': noticia})

@@ -103,6 +103,46 @@
         grid-template-columns: 300px 1fr;
     }
 </style>
+<style>
+    /* Estilos anteriores aquí ... */
+
+    /* Estilos para la vista detallada del producto */
+    .producto-detalle-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-gap: 20px;
+        margin-top: 20px;
+    }
+
+    .producto-detalle-imagen {
+        text-align: center;
+    }
+
+    .producto-detalle-imagen img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+
+    .producto-detalle-info {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+{% if detalle_producto %}
+<div class="producto-detalle-container">
+    <div class="producto-detalle-imagen">
+        <img src="{{ detalle_producto.imagen.url }}" alt="{{ detalle_producto.nombre }}">
+    </div>
+    <div class="producto-detalle-info">
+        <h2>{{ detalle_producto.nombre }}</h2>
+        <p>Código de barras: {{ detalle_producto.codigo_barras }}</p>
+        <p>Precio: ${{ detalle_producto.precio }}</p>
+        <p>{{ detalle_producto.descripcion }}</p>
+    </div>
+</div>
+{% endif %}
+
 <h2>Productos</h2>
 <div class="productos-container">
     <div class="filtros-container">
@@ -129,42 +169,58 @@
             <div class="card-body">
                 <h5 class="card-title">{{ p.nombre }}</h5>
                 <p class="card-text"><strong>${{ p.precio }}</strong></p>
-                <form method="post" action="{% url 'agregar_al_carrito' p.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
-                </form>
-                <a href="{% url 'detalle_producto' p.id %}" class="btn btn-secondary">Ver más</a>
+                <a href="{% url 'detalle_producto' p.id %}" class="btn btn-primary">Ver más</a>
             </div>
         </div>
         {% endfor %}
     </div>
-    
+
     <div class="paginator">
-        <ul class="pagination">
-            {% if productos.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">&laquo; 1</a>
-                <li class="page-item active" aria-current="page">
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ productos.previous_page_number }}">Anterior</a>
-            </li>
-            {% endif %}
-
-            <li class="page-item disabled">
-                <span class="page-link">
-                    Página {{ productos.number }} de {{ productos.paginator.num_pages }}.
-                </span>
-            </li>
-
-            {% if productos.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ productos.next_page_number }}">Siguiente</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ productos.paginator.num_pages }}">Última &raquo;</a>
-            </li>
-            {% endif %}
-        </ul>
+        <!-- Paginación ... -->
     </div>
-    {% endblock %}
+</div>
+
+<div class="productos-list">
+    {% for sugerencia in sugerencias %}
+    <div class="card producto">
+        <img class="card-img-top" src="{{ sugerencia.imagen.url }}" alt="{{ sugerencia.nombre }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ sugerencia.nombre }}</h5>
+            <p class="card-text"><strong>${{ sugerencia.precio }}</strong></p>
+            <form method="post" action="{% url 'agregar_al_carrito' sugerencia.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="paginator">
+    <ul class="pagination">
+        {% if productos.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">&laquo; Primera</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ productos.previous_page_number }}">Anterior</a>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Página {{ productos.number }} de {{ productos.paginator.num_pages }}.
+            </span>
+        </li>
+
+        {% if productos.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ productos.next_page_number }}">Siguiente</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ productos.paginator.num_pages }}">Última &raquo;</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+    <h2>Lista de Repartos</h2>
+    <ul>
+        {% for reparto in repartos %}
+            <li><a href="{% url 'reparto_detail' reparto.pk %}">{{ reparto.fecha }} - {{ reparto.persona_recibe }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

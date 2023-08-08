@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+    <h2>Nuevo Reparto</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar Reparto</button>
+    </form>
+{% endblock %}

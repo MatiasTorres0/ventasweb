@@ -95,3 +95,28 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+
+class Reparto(models.Model):
+    fecha = models.DateField()
+    region = models.CharField(max_length=100)
+    ciudad = models.CharField(max_length=100)
+    comuna = models.CharField(max_length=100)
+    direccion = models.CharField(max_length=200)
+    persona_recibe = models.CharField(max_length=200)
+    numero_contacto = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.fecha
+    
+
+
+class Noticia(models.Model):
+    titulo = models.CharField(max_length=200)
+    contenido = models.TextField()
+    imagen = models.ImageField(upload_to='noticias', blank=True, null=True)
+    fecha_publicacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo

@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+    <h2>Detalle del Reparto</h2>
+    <p><strong>Fecha:</strong> {{ reparto.fecha }}</p>
+    <p><strong>Región:</strong> {{ reparto.region }}</p>
+    <p><strong>Ciudad:</strong> {{ reparto.ciudad }}</p>
+    <p><strong>Comuna:</strong> {{ reparto.comuna }}</p>
+    <p><strong>Dirección:</strong> {{ reparto.direccion }}</p>
+    <p><strong>Persona que Recibe:</strong> {{ reparto.persona_recibe }}</p>
+    <p><strong>Número de Contacto:</strong> {{ reparto.numero_contacto }}</p>
+    <!-- Agrega otros campos aquí -->
+    <a href="{% url 'reparto_list' %}">Volver a la Lista de Repartos</a>
+{% endblock %}
