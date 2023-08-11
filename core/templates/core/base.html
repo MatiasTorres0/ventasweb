@@ -125,12 +125,12 @@
                                 <div class="limit-box">
                                     <nav class="main-menu">
                                         <ul class="menu-area-main">
-                                            <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                                            <li class="active"><a href="{% url 'home' %}">Inicio</a></li>
                                             {% if user.is_authenticated %}
                                             <li><a href="{% url 'listado_productos' %}">Productos</a></li>
                                             <li><a href="{% url 'creararticulo' %}">Crea </a></li>
                                             <li><a href="{% url 'cargar_productos' %}">Subir Excel</a></li>
-                                            <li><a href="{% url 'soporte' %}">Contact Us</a></li>
+                                            <li><a href="{% url 'soporte' %}">Contacto</a></li>
                                             {% endif %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
                                             {% if user.is_authenticated %}
